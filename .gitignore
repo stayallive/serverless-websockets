@@ -1,0 +1,3 @@
+.serverless/
+vendor/
+.php_cs.cache

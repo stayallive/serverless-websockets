@@ -1,0 +1,78 @@
+service: serverless-websockets
+
+provider:
+  name: aws
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-central-1'}
+  runtime: provided
+  apiGateway:
+    shouldStartNameWithService: true
+  environment:
+    APP_STAGE: ${opt:stage, self:provider.stage}
+    APP_REGION: ${opt:region, self:provider.region}
+    APP_API_ID: !Ref "ApiGatewayRestApi"
+    APP_WS_API_ID: !Ref "WebsocketsApi"
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - { "Fn::GetAtt": [ "DynamoDBConnectionPoolTable", "Arn" ] }
+        - { "Fn::GetAtt": [ "DynamoDBChannelsTable", "Arn" ] }
+
+plugins:
+  - ./vendor/bref/bref
+
+functions:
+  api:
+    handler: handlers/api.php
+    description: ''
+    timeout: 10
+    layers:
+      - ${bref:layer.php-74-fpm}
+    events:
+      - http: 'ANY /'
+      - http: 'ANY /{proxy+}'
+  websocket:
+    handler: handlers/websocket.php
+    layers:
+      - ${bref:layer.php-74}
+    events:
+      - websocket: $connect
+      - websocket: $disconnect
+      - websocket:
+          route: $default
+          routeResponseSelectionExpression: $default
+
+resources:
+  Resources:
+    DynamoDBConnectionPoolTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: serverless-websockets-connection-pool
+        BillingMode: 'PAY_PER_REQUEST'
+        AttributeDefinitions:
+          - AttributeName: connection-id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: connection-id
+            KeyType: HASH
+    DynamoDBChannelsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: serverless-websockets-channels
+        BillingMode: 'PAY_PER_REQUEST'
+        AttributeDefinitions:
+          - AttributeName: channel-id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: channel-id
+            KeyType: HASH
+
+package:
+  exclude:
+    - 'node_modules/**'
+    - 'tests/**'

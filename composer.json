@@ -1,0 +1,38 @@
+{
+    "name": "stayallive/serverless-websockets",
+    "description": "Websockets for Serverless.",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alex Bouma",
+            "email": "me@alexbouma.me",
+            "homepage": "https://alex.bouma.dev",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "bref/bref": "^0.5.33",
+        "async-aws/dynamo-db": "^1.0",
+        "symfony/http-client": "^5.1",
+        "slim/slim": "^4.6",
+        "slim/psr7": "^1.2",
+        "illuminate/support": "^8.15"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.16"
+    },
+    "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
+        "psr-4": {
+            "Stayallive\\ServerlessWebSockets\\": "src"
+        }
+    },
+    "scripts": {
+        "phpcs": "vendor/bin/php-cs-fixer fix",
+        "phpcs-ci": "vendor/bin/php-cs-fixer fix --dry-run --diff"
+    }
+}
