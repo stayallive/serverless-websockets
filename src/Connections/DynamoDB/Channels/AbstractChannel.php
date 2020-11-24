@@ -1,6 +1,6 @@
 <?php
 
-namespace Stayallive\ServerlessWebSockets\Connections\DynamoDB;
+namespace Stayallive\ServerlessWebSockets\Connections\DynamoDB\Channels;
 
 use AsyncAws\DynamoDb\DynamoDbClient;
 use AsyncAws\DynamoDb\Input\DeleteItemInput;
@@ -9,9 +9,10 @@ use AsyncAws\Core\Exception\Http\HttpException;
 use AsyncAws\DynamoDb\ValueObject\AttributeValue;
 use Stayallive\ServerlessWebSockets\Messages\BuildsPusherMessages;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Stayallive\ServerlessWebSockets\Connections\Channel as BaseChannel;
+use Stayallive\ServerlessWebSockets\Connections\DynamoDB\ConnectionManager;
+use Stayallive\ServerlessWebSockets\Connections\Channels\AbstractChannel as BaseChannel;
 
-abstract class Channel extends BaseChannel
+abstract class AbstractChannel extends BaseChannel
 {
     use BuildsPusherMessages;
 
@@ -31,34 +32,15 @@ abstract class Channel extends BaseChannel
     }
 
 
-    public function subscribe(string $connectionId, array $payload): array
+    public function subscribe(string $connectionId, string $socketId, array $payload): array
     {
         $this->createEmptyChannelIfNeeded();
 
         $this->subscribeOnConnectionPool($connectionId);
 
-        $result = $this->db->updateItem(new UpdateItemInput([
-            'TableName'                 => ConnectionManager::CHANNELS_TABLE,
-            'Key'                       => [
-                'channel-id' => new AttributeValue(['S' => $this->name]),
-            ],
-            'ReturnValues'              => 'UPDATED_NEW',
-            'UpdateExpression'          => 'SET #connections.#socket = :stage',
-            'ConditionExpression'       => 'attribute_not_exists(#connections.#socket)',
-            'ExpressionAttributeNames'  => [
-                '#socket'      => $connectionId,
-                '#connections' => 'connections',
-            ],
-            'ExpressionAttributeValues' => [
-                ':stage' => new AttributeValue(['S' => (string)time()]),
-            ],
-        ]));
+        $this->addConnectionForConnectionId($connectionId, $socketId, $payload);
 
-        $this->data = array_merge($this->data, $result->getAttributes());
-
-        return $this->buildPusherChannelMessage($this->name, 'pusher_internal:subscription_succeeded', [
-            'connected' => $this->connectionCount(),
-        ]);
+        return $this->buildPusherChannelMessage($this->name, 'pusher_internal:subscription_succeeded');
     }
 
     public function unsubscribe(string $connectionId): array
@@ -66,20 +48,7 @@ abstract class Channel extends BaseChannel
         if ($this->exists()) {
             $this->unsubscribeOnConnectionPool($connectionId);
 
-            $result = $this->db->updateItem(new UpdateItemInput([
-                'TableName'                => ConnectionManager::CHANNELS_TABLE,
-                'Key'                      => [
-                    'channel-id' => new AttributeValue(['S' => $this->name]),
-                ],
-                'ReturnValues'             => 'ALL_NEW',
-                'UpdateExpression'         => 'REMOVE #connections.#socket',
-                'ExpressionAttributeNames' => [
-                    '#socket'      => $connectionId,
-                    '#connections' => 'connections',
-                ],
-            ]));
-
-            $this->data = array_merge($this->data, $result->getAttributes());
+            $this->removeConnectionForConnectionId($connectionId);
 
             $this->cleanupChannelIfEmpty();
         }
@@ -87,6 +56,11 @@ abstract class Channel extends BaseChannel
         return $this->buildPusherMessage('pusher:ack');
     }
 
+
+    public function connectionIds(): array
+    {
+        return array_keys($this->connections());
+    }
 
     public function hasConnections(): bool
     {
@@ -98,18 +72,13 @@ abstract class Channel extends BaseChannel
         return count($this->connections());
     }
 
-    public function connectedSocketIds(): array
-    {
-        return array_keys($this->connections());
-    }
-
 
     public function broadcast(string $event, ?array $data = null): void
     {
         $this->broadcastToEveryoneExcept($event, $data);
     }
 
-    public function broadcastToEveryoneExcept(string $event, ?array $data = null, ?string $exceptSocketId = null): void
+    public function broadcastToEveryoneExcept(string $event, ?array $data = null, ?string $exceptConnectionId = null): void
     {
         $message = [
             'event'   => $event,
@@ -122,22 +91,20 @@ abstract class Channel extends BaseChannel
 
         $message = json_encode($message);
 
-        foreach ($this->connectedSocketIds() as $socketId) {
-            if ($exceptSocketId === $socketId) {
+        foreach ($this->connectionIds() as $connectionId) {
+            if ($exceptConnectionId !== null && $exceptConnectionId === $connectionId) {
                 continue;
             }
 
             try {
-                socket_client()->message($socketId, $message);
+                socket_client()->message($connectionId, $message);
             } catch (ClientExceptionInterface $e) {
                 // Handle disconnected clients that were not cleaned up correctly
                 if ($e->getResponse()->getStatusCode() === 410) {
-                    $this->unsubscribe($socketId);
+                    $this->unsubscribe($connectionId);
 
                     continue;
                 }
-
-                throw $e;
             }
         }
     }
@@ -257,17 +224,63 @@ abstract class Channel extends BaseChannel
                 'channel-id' => new AttributeValue(['S' => $this->name]),
             ],
             'ReturnValues'              => 'ALL_NEW',
-            'UpdateExpression'          => 'SET #connections = if_not_exists(#connections, :connections), #type = if_not_exists(#type, :type)',
+            'UpdateExpression'          => 'SET #connections = if_not_exists(#connections, :connections), #users = if_not_exists(#users, :users), #type = if_not_exists(#type, :type)',
             'ExpressionAttributeNames'  => [
                 '#type'        => 'type',
+                '#users'       => 'users',
                 '#connections' => 'connections',
             ],
             'ExpressionAttributeValues' => [
                 ':type'        => new AttributeValue(['S' => class_basename($this)]),
+                ':users'       => new AttributeValue(['M' => []]),
                 ':connections' => new AttributeValue(['M' => []]),
             ],
         ]));
 
         $this->data = $result->getAttributes();
+    }
+
+
+    protected function addConnectionForConnectionId(string $connectionId, string $socketId, array $payload): void
+    {
+        $result = $this->db->updateItem(new UpdateItemInput([
+            'TableName'                 => ConnectionManager::CHANNELS_TABLE,
+            'Key'                       => [
+                'channel-id' => new AttributeValue(['S' => $this->name]),
+            ],
+            'ReturnValues'              => 'ALL_NEW',
+            'UpdateExpression'          => 'SET #connections.#connection = :user',
+            'ExpressionAttributeNames'  => [
+                '#connection'  => $connectionId,
+                '#connections' => 'connections',
+            ],
+            'ExpressionAttributeValues' => [
+                ':user' => new AttributeValue([
+                    'M' => [
+                        'socket-id' => new AttributeValue(['S' => $socketId]),
+                    ],
+                ]),
+            ],
+        ]));
+
+        $this->data = array_merge($this->data, $result->getAttributes());
+    }
+
+    protected function removeConnectionForConnectionId(string $connectionId): void
+    {
+        $result = $this->db->updateItem(new UpdateItemInput([
+            'TableName'                => ConnectionManager::CHANNELS_TABLE,
+            'Key'                      => [
+                'channel-id' => new AttributeValue(['S' => $this->name]),
+            ],
+            'ReturnValues'             => 'ALL_NEW',
+            'UpdateExpression'         => 'REMOVE #connections.#socket',
+            'ExpressionAttributeNames' => [
+                '#socket'      => $connectionId,
+                '#connections' => 'connections',
+            ],
+        ]));
+
+        $this->data = array_merge($this->data, $result->getAttributes());
     }
 }

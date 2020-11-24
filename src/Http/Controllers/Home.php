@@ -7,7 +7,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class Home extends Controller
 {
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $response->getBody()->write(view(VIEW_PATH . '/index.php'));
 

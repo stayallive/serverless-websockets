@@ -4,6 +4,7 @@ namespace Stayallive\ServerlessWebSockets\Messages;
 
 use Illuminate\Support\Str;
 use Bref\Event\ApiGateway\WebsocketEvent;
+use Stayallive\ServerlessWebSockets\Connections\ConnectionManager;
 
 class InternalProtocolMessageHandler implements MessageHandler
 {
@@ -13,10 +14,13 @@ class InternalProtocolMessageHandler implements MessageHandler
 
     private array $payload;
 
-    public function __construct(array $payload, WebsocketEvent $event)
+    private ConnectionManager $connectionManager;
+
+    public function __construct(array $payload, WebsocketEvent $event, ConnectionManager $connectionManager)
     {
-        $this->payload = $payload;
-        $this->event   = $event;
+        $this->payload           = $payload;
+        $this->event             = $event;
+        $this->connectionManager = $connectionManager;
     }
 
     /**
@@ -40,8 +44,14 @@ class InternalProtocolMessageHandler implements MessageHandler
      */
     private function connect(): array
     {
+        $socketId = $this->connectionManager->findSocketIdForConnection($this->event->getConnectionId());
+
+        if ($socketId === null) {
+            return $this->buildPusherErrorMessage('Socket not registered.', 4200);
+        }
+
         return $this->buildPusherEventMessage('pusher:connection_established', [
-            'socket_id'        => $this->event->getConnectionId(),
+            'socket_id'        => $socketId,
             'activity_timeout' => 30,
         ]);
     }

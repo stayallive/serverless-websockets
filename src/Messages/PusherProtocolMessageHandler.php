@@ -50,7 +50,10 @@ class PusherProtocolMessageHandler implements MessageHandler
      */
     protected function subscribe(): array
     {
-        return $this->channelManager->findOrCreateChannel($this->payload['data']['channel'])->subscribe($this->event->getConnectionId(), $this->payload['data'] ?? []);
+        $socketId = $this->channelManager->findSocketIdForConnection($this->event->getConnectionId());
+
+        return $this->channelManager->findOrCreateChannel($this->payload['data']['channel'])
+                                    ->subscribe($this->event->getConnectionId(), $socketId, $this->payload['data'] ?? []);
     }
 
     /**
@@ -58,6 +61,7 @@ class PusherProtocolMessageHandler implements MessageHandler
      */
     protected function unsubscribe(): array
     {
-        return $this->channelManager->findOrCreateChannel($this->payload['data']['channel'])->unsubscribe($this->event->getConnectionId());
+        return $this->channelManager->findOrCreateChannel($this->payload['data']['channel'])
+                                    ->unsubscribe($this->event->getConnectionId());
     }
 }

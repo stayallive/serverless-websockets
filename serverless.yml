@@ -15,6 +15,7 @@ provider:
     APP_SECRET: 'AwGaqvwvZhhGZ3xpCKY7VKz9'
     APP_API_ID: !Ref "ApiGatewayRestApi"
     APP_WS_API_ID: !Ref "WebsocketsApi"
+    APP_CLIENT_EVENTS: 'true'
   iamRoleStatements:
     - Effect: Allow
       Action:

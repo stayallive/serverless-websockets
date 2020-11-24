@@ -13,7 +13,7 @@ class MessageHandlerFactory
         $payload = json_decode($event->getBody(), true);
 
         if (Str::startsWith($payload['event'], 'internal:')) {
-            return new InternalProtocolMessageHandler($payload, $event);
+            return new InternalProtocolMessageHandler($payload, $event, $channelManager);
         }
 
         return Str::startsWith($payload['event'], 'pusher:')

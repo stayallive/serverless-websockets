@@ -51,6 +51,7 @@ $errorHandler->setErrorHandler(
 );
 
 $app->get('/', Controllers\Home::class);
+$app->post('/pusher/auth', Controllers\SocketAuth::class);
 
 $app->group('/apps/{appId}', function (RouteCollectorProxy $group) {
     $group->post('/events', Controllers\TriggerEvent::class);

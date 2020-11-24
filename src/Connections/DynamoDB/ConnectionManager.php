@@ -11,7 +11,10 @@ use Bref\Event\ApiGateway\WebsocketEvent;
 use AsyncAws\DynamoDb\Input\DeleteItemInput;
 use AsyncAws\Core\Exception\Http\HttpException;
 use AsyncAws\DynamoDb\ValueObject\AttributeValue;
-use Stayallive\ServerlessWebSockets\Connections\Channel;
+use Stayallive\ServerlessWebSockets\Connections\Channels\AbstractChannel;
+use Stayallive\ServerlessWebSockets\Connections\DynamoDB\Channels\PublicChannel;
+use Stayallive\ServerlessWebSockets\Connections\DynamoDB\Channels\PrivateChannel;
+use Stayallive\ServerlessWebSockets\Connections\DynamoDB\Channels\PresenceChannel;
 use Stayallive\ServerlessWebSockets\Connections\ConnectionManager as BaseConnectionManager;
 
 class ConnectionManager implements BaseConnectionManager
@@ -33,6 +36,7 @@ class ConnectionManager implements BaseConnectionManager
             'TableName' => self::CONNECTION_POOL_TABLE,
             'Item'      => [
                 'connection-id' => new AttributeValue(['S' => $event->getConnectionId()]),
+                'socket-id'     => new AttributeValue(['S' => $this->generateSocketId()]),
                 'api-id'        => new AttributeValue(['S' => $event->getApiId()]),
                 'region'        => new AttributeValue(['S' => $event->getRegion()]),
                 'stage'         => new AttributeValue(['S' => $event->getStage()]),
@@ -50,6 +54,32 @@ class ConnectionManager implements BaseConnectionManager
                 'connection-id' => new AttributeValue(['S' => $event->getConnectionId()]),
             ],
         ]));
+    }
+
+
+    public function findSocketIdForConnection(string $connectionId): ?string
+    {
+        $request = $this->db->getItem(new GetItemInput([
+            'TableName'      => self::CONNECTION_POOL_TABLE,
+            'Key'            => [
+                'connection-id' => new AttributeValue(['S' => $connectionId]),
+            ],
+            'ConsistentRead' => true,
+        ]));
+
+        try {
+            $request->resolve();
+        } catch (HttpException $e) {
+            return null;
+        }
+
+        $result = $request->getItem();
+
+        if (empty($result)) {
+            return null;
+        }
+
+        return $result['socket-id']->getS();
     }
 
 
@@ -78,7 +108,7 @@ class ConnectionManager implements BaseConnectionManager
         return $channels;
     }
 
-    public function findChannel(string $channelName): ?Channel
+    public function findChannel(string $channelName): ?AbstractChannel
     {
         $request = $this->db->getItem(new GetItemInput([
             'TableName'      => self::CHANNELS_TABLE,
@@ -105,7 +135,7 @@ class ConnectionManager implements BaseConnectionManager
         return new $channelClass($channelName, $this->db, $result);
     }
 
-    public function findOrCreateChannel(string $channelName): Channel
+    public function findOrCreateChannel(string $channelName): AbstractChannel
     {
         $channel = $this->findChannel($channelName);
 
@@ -118,6 +148,11 @@ class ConnectionManager implements BaseConnectionManager
         return $channel;
     }
 
+
+    protected function generateSocketId(): string
+    {
+        return sprintf('%d.%d', random_int(1, 1000000000), random_int(1, 1000000000));
+    }
 
     protected function removeFromAllChannels(string $connectionId): void
     {
@@ -146,7 +181,7 @@ class ConnectionManager implements BaseConnectionManager
             $channel = $this->findChannel($channel);
 
             if ($channel !== null) {
-                if ($channel instanceof Channel) {
+                if ($channel instanceof AbstractChannel) {
                     $channel->updateConnectionPool(false);
                 }
 

@@ -5,10 +5,49 @@
         <title>Websockets for Serverless!</title>
         <link href="https://fonts.googleapis.com/css?family=Dosis:300&display=swap" rel="stylesheet">
         <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+        <style>
+            /* https://jarv.is/notes/css-waving-hand-emoji/ */
+            .wave > span {
+                animation-name: wave-animation; /* Refers to the name of your @keyframes element below */
+                animation-duration: 2s; /* Change to speed up or slow down */
+                animation-iteration-count: 1;
+                transform-origin: 70% 70%; /* Pivot around the bottom-left palm */
+                display: inline-block;
+            }
+
+            @keyframes wave-animation {
+                0% {
+                    transform: rotate(0.0deg)
+                }
+                10% {
+                    transform: rotate(14.0deg)
+                }
+                /* The following five values can be played with to make the waving more or less extreme */
+                20% {
+                    transform: rotate(-8.0deg)
+                }
+                30% {
+                    transform: rotate(14.0deg)
+                }
+                40% {
+                    transform: rotate(-4.0deg)
+                }
+                50% {
+                    transform: rotate(10.0deg)
+                }
+                60% {
+                    transform: rotate(0.0deg)
+                }
+                /* Reset for the last half to pause */
+                100% {
+                    transform: rotate(0.0deg)
+                }
+            }
+        </style>
     </head>
     <body class="flex h-screen">
         <div class="rounded-full mx-auto self-center relative" style="height: 400px; width: 400px; background: linear-gradient(123.19deg, #266488 3.98%, #258ecb 94.36%)">
-            <h1 class="font-light absolute w-full text-center text-blue-200" style="font-family: Dosis; font-size: 45px; top: 35%">Hello there,</h1>
+            <h1 class="font-light absolute w-full text-center text-blue-200" style="font-family: Dosis; font-size: 45px; top: 30%" id="counter">Hello there,</h1>
             <div class="w-full relative absolute" style="top: 60%; height: 50%">
                 <div class="absolute inset-x-0 bg-white" style="bottom: 0; height: 55%"></div>
                 <svg viewBox="0 0 1280 311" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -23,8 +62,51 @@
                     </defs>
                 </svg>
             </div>
+            <div class="absolute w-full text-center">
+                <a id="say-hi" href="#" class="shadown inline-flex items-center justify-center self-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50" style="font-size: 40px;">
+                    <span>👋</span>
+                </a>
+            </div>
         </div>
 
+        <script>
+            function setCookie(name, value, days) {
+                var expires = '';
+                if (days) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = '; expires=' + date.toUTCString();
+                }
+                document.cookie = name + '=' + (value || '') + expires + '; path=/';
+            }
+
+            function getCookie(name) {
+                var nameEQ = name + '=';
+                var ca     = document.cookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            }
+
+            function eraseCookie(name) {
+                document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            }
+
+            function uuidv4() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+
+            // Generate a random user ID for the session
+            if (getCookie('user_id') === null) {
+                setCookie('user_id', uuidv4(), 7);
+            }
+        </script>
         <script src="https://js.pusher.com/7.0.1/pusher.min.js"></script>
         <script>
             Pusher.log = (msg) => {
@@ -63,7 +145,38 @@
                 wsPath:            '/<?php echo app_stage(); ?>',
                 forceTLS:          true,
                 enableStats:       false,
+                authEndpoint:      '/<?php echo app_stage(); ?>/pusher/auth',
                 enabledTransports: ['ws'],
+            });
+
+            const presenceChannel = pusher.subscribe('presence-test');
+
+            function updateCounter() {
+                // Extract one to not count the current browser
+                let count = presenceChannel.members.count - 1;
+
+                document.getElementById('counter').innerText = 'Say hi to ' + count + ' browsers!';
+            }
+
+            function wave() {
+                let element = document.getElementById('say-hi');
+
+                element.classList.remove('wave');
+                element.offsetWidth;
+                element.classList.add('wave');
+            }
+
+            presenceChannel.bind('pusher:subscription_succeeded', updateCounter);
+            presenceChannel.bind('pusher:member_added', updateCounter);
+            presenceChannel.bind('pusher:member_removed', updateCounter);
+            presenceChannel.bind('client-hi', wave);
+
+            document.getElementById('say-hi').addEventListener('click', (e) => {
+                e.preventDefault();
+
+                presenceChannel.trigger('client-hi');
+
+                wave();
             });
         </script>
     </body>
