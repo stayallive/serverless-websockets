@@ -8,13 +8,17 @@ provider:
   apiGateway:
     shouldStartNameWithService: true
   environment:
+    APP_ID: 'sws'
+    APP_KEY: 'sws'
     APP_STAGE: ${opt:stage, self:provider.stage}
     APP_REGION: ${opt:region, self:provider.region}
+    APP_SECRET: 'AwGaqvwvZhhGZ3xpCKY7VKz9'
     APP_API_ID: !Ref "ApiGatewayRestApi"
     APP_WS_API_ID: !Ref "WebsocketsApi"
   iamRoleStatements:
     - Effect: Allow
       Action:
+        - dynamodb:Scan
         - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:UpdateItem

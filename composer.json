@@ -18,7 +18,9 @@
         "symfony/http-client": "^5.1",
         "slim/slim": "^4.6",
         "slim/psr7": "^1.2",
-        "illuminate/support": "^8.15"
+        "illuminate/support": "^8.15",
+        "php-di/slim-bridge": "^3.0",
+        "pusher/pusher-php-server": "^4.1"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.16"

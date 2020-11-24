@@ -1,15 +1,32 @@
 <?php
 
-use Slim\Factory\AppFactory;
+use Slim\App;
+use AsyncAws\DynamoDb\DynamoDbClient;
+use Psr\Container\ContainerInterface;
+use Slim\Routing\RouteCollectorProxy;
 use Slim\Exception\HttpNotFoundException;
-use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ResponseFactoryInterface;
+use Stayallive\ServerlessWebSockets\Http\Middleware;
+use Stayallive\ServerlessWebSockets\Http\Controllers;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Stayallive\ServerlessWebSockets\Connections\ConnectionManager;
+use Stayallive\ServerlessWebSockets\Connections\DynamoDB\ConnectionManager as DynamoDBConnectionManager;
 
 const VIEW_PATH = __DIR__ . '/../resources/views';
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$app = AppFactory::create();
+$app = DI\Bridge\Slim\Bridge::create();
+
+/** @var \DI\Container $container */
+$container = $app->getContainer();
+
+$container->set(ResponseFactoryInterface::class, function (ContainerInterface $container) {
+    return $container->get(App::class)->getResponseFactory();
+});
+$container->set(ConnectionManager::class, function () {
+    return new DynamoDBConnectionManager(new DynamoDbClient);
+});
 
 $app->addRoutingMiddleware();
 
@@ -33,10 +50,18 @@ $errorHandler->setErrorHandler(
     }
 );
 
-$app->get('/', function (Request $request, Response $response) {
-    $response->getBody()->write(view(VIEW_PATH . '/index.php'));
+$app->get('/', Controllers\Home::class);
 
-    return $response;
-});
+$app->group('/apps/{appId}', function (RouteCollectorProxy $group) {
+    $group->post('/events', Controllers\TriggerEvent::class);
+
+    $group->get('/channels', Controllers\FetchChannels::class);
+//    $group->get('/channels/{channel}', '');
+//    $group->get('/channels/{channel}/users', '');
+})->add(
+    $container->get(Middleware\EnsureValidAppKey::class)
+)->add(
+    $container->get(Middleware\EnsureValidSignature::class)
+);
 
 $app->run();

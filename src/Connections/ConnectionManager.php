@@ -10,6 +10,9 @@ interface ConnectionManager
 
     public function disconnect(WebsocketEvent $event): void;
 
+
+    public function channels(): array;
+
     public function findChannel(string $channelName): ?Channel;
 
     public function findOrCreateChannel(string $channelName): Channel;

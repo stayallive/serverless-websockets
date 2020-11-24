@@ -106,6 +106,11 @@ abstract class Channel extends BaseChannel
 
     public function broadcast(string $event, ?array $data = null): void
     {
+        $this->broadcastToEveryoneExcept($event, $data);
+    }
+
+    public function broadcastToEveryoneExcept(string $event, ?array $data = null, ?string $exceptSocketId = null): void
+    {
         $message = [
             'event'   => $event,
             'channel' => $this->name,
@@ -118,6 +123,10 @@ abstract class Channel extends BaseChannel
         $message = json_encode($message);
 
         foreach ($this->connectedSocketIds() as $socketId) {
+            if ($exceptSocketId === $socketId) {
+                continue;
+            }
+
             try {
                 socket_client()->message($socketId, $message);
             } catch (ClientExceptionInterface $e) {

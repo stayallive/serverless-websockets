@@ -25,4 +25,6 @@ abstract class Channel
 
 
     abstract public function broadcast(string $event, ?array $data = null): void;
+
+    abstract public function broadcastToEveryoneExcept(string $event, ?array $data = null, ?string $exceptSocketId = null): void;
 }

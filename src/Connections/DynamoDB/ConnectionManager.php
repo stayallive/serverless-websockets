@@ -4,6 +4,7 @@ namespace Stayallive\ServerlessWebSockets\Connections\DynamoDB;
 
 use Illuminate\Support\Str;
 use AsyncAws\DynamoDb\DynamoDbClient;
+use AsyncAws\DynamoDb\Input\ScanInput;
 use AsyncAws\DynamoDb\Input\GetItemInput;
 use AsyncAws\DynamoDb\Input\PutItemInput;
 use Bref\Event\ApiGateway\WebsocketEvent;
@@ -51,6 +52,31 @@ class ConnectionManager implements BaseConnectionManager
         ]));
     }
 
+
+    public function channels(): array
+    {
+        $request = $this->db->scan(new ScanInput([
+            'TableName'      => self::CHANNELS_TABLE,
+            'ConsistentRead' => true,
+        ]));
+
+        try {
+            $request->resolve();
+        } catch (HttpException $e) {
+            return [];
+        }
+
+        $channels = [];
+
+        foreach ($request->getItems() as $channelData) {
+            $channelName  = $channelData['channel-id']->getS();
+            $channelClass = $this->determineChannelClass($channelName);
+
+            $channels[$channelName] = new $channelClass($channelName, $this->db, $channelData);
+        }
+
+        return $channels;
+    }
 
     public function findChannel(string $channelName): ?Channel
     {
