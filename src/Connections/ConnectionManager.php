@@ -20,7 +20,7 @@ abstract class ConnectionManager
 
     abstract public function findChannel(string $channelName): ?AbstractChannel;
 
-    abstract public function findOrCreateChannel(string $channelName): AbstractChannel;
+    abstract public function findOrNewChannel(string $channelName): AbstractChannel;
 
 
     public function isAuthenticatedChannel(string $channelName): bool

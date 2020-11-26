@@ -26,7 +26,7 @@ class EnsureValidSignature extends Middleware
 
         $signature = "{$request->getMethod()}\n{$route->getRoutingResults()->getUri()}\n" . Pusher::array_implode('=', '&', $params);
 
-        $authSignature = hash_hmac('sha256', $signature, getenv('APP_SECRET'));
+        $authSignature = hash_hmac('sha256', $signature, app_secret());
 
         if ($authSignature !== ($queryParams['auth_signature'] ?? null)) {
             return $this->responseFactory->createResponse(401, 'Invalid auth signature provided.');

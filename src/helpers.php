@@ -4,34 +4,60 @@ use Illuminate\Support\Str;
 use Bref\Websocket\SimpleWebsocketClient;
 use Symfony\Component\HttpClient\HttpClient;
 
+function get_required_env_var(string $name)
+{
+    $value = getenv($name);
+
+    if (empty($value)) {
+        throw new RuntimeException("There is no {$name} environment variable defined.");
+    }
+
+    return $value;
+}
+
+function app_id(): string
+{
+    return get_required_env_var('APP_ID');
+}
+
+function app_key(): string
+{
+    return get_required_env_var('APP_KEY');
+}
+
 function app_stage(): string
 {
-    return getenv('APP_STAGE');
+    return get_required_env_var('APP_STAGE');
+}
+
+function app_secret(): string
+{
+    return get_required_env_var('APP_SECRET');
 }
 
 function app_region(): string
 {
-    return getenv('APP_REGION');
-}
-
-function app_api_id(): string
-{
-    return getenv('APP_API_ID');
-}
-
-function app_api_endpoint(): string
-{
-    return sprintf('%s.execute-api.%s.amazonaws.com', app_api_id(), app_region());
+    return get_required_env_var('APP_REGION');
 }
 
 function app_ws_api_id(): string
 {
-    return getenv('APP_WS_API_ID');
+    return get_required_env_var('APP_WS_API_ID');
 }
 
 function app_ws_api_endpoint(): string
 {
     return sprintf('%s.execute-api.%s.amazonaws.com', app_ws_api_id(), app_region());
+}
+
+function wave_example_enabled(): bool
+{
+    return get_required_env_var('APP_WAVE_EXAMPLE_ENABLED') === 'true';
+}
+
+function client_events_enabled(): bool
+{
+    return get_required_env_var('APP_CLIENT_EVENTS') === 'true';
 }
 
 function socket_client(): SimpleWebsocketClient

@@ -2,9 +2,9 @@
 
 namespace Stayallive\ServerlessWebSockets\Http\Controllers;
 
+use stdClass;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
 abstract class Controller
@@ -15,8 +15,6 @@ abstract class Controller
     {
         $this->responseFactory = $responseFactory;
     }
-
-    abstract public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface;
 
     protected function response(int $status = 204, string $message = ''): ResponseInterface
     {
@@ -37,6 +35,11 @@ abstract class Controller
     protected function jsonResponse(array $data = [], int $status = 200): ResponseInterface
     {
         $response = $this->responseFactory->createResponse($status);
+
+        // Make sure empty response contain an emoty JSON hash
+        if (empty($data)) {
+            $data = new stdClass;
+        }
 
         $response->getBody()->write(json_encode($data));
 

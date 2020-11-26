@@ -25,7 +25,7 @@ class PusherClientMessageHandler implements MessageHandler
 
     public function respond(): Message
     {
-        if (getenv('APP_CLIENT_EVENTS') !== 'true') {
+        if (!client_events_enabled()) {
             return $this->buildPusherErrorMessage('Client events are not allowed');
         }
 

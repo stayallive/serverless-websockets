@@ -50,19 +50,22 @@ $errorHandler->setErrorHandler(
     }
 );
 
-$app->get('/', Controllers\Home::class);
-$app->post('/pusher/auth', Controllers\SocketAuth::class);
+if (wave_example_enabled()) {
+    $app->group('/wave', function (RouteCollectorProxy $group) {
+        $group->get('', Controllers\Wave\View::class);
+        $group->post('/pusher/auth', Controllers\Wave\SocketAuth::class);
+    });
+}
 
 $app->group('/apps/{appId}', function (RouteCollectorProxy $group) {
-    $group->post('/events', Controllers\TriggerEvent::class);
+    $group->post('/events', Controllers\API\Pusher\TriggerEvent::class);
+    $group->post('/batch_events', Controllers\API\Pusher\TriggerEvents::class);
 
-    $group->get('/channels', Controllers\FetchChannels::class);
-//    $group->get('/channels/{channel}', '');
-//    $group->get('/channels/{channel}/users', '');
-})->add(
-    $container->get(Middleware\EnsureValidAppKey::class)
-)->add(
-    $container->get(Middleware\EnsureValidSignature::class)
-);
+    $group->get('/channels', Controllers\API\Pusher\FetchChannels::class);
+    $group->get('/channels/{channelName}', Controllers\API\Pusher\FetchChannel::class);
+    $group->get('/channels/{channelName}/users', Controllers\API\Pusher\FetchChannelUsers::class);
+})
+    ->add($container->get(Middleware\EnsureValidAppKey::class))
+    ->add($container->get(Middleware\EnsureValidSignature::class));
 
 $app->run();

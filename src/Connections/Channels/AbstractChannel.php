@@ -40,6 +40,6 @@ abstract class AbstractChannel implements Channel
             $signature .= ":{$payload['channel_data']}";
         }
 
-        return Str::after($payload['auth'] ?? '', ':') === hash_hmac('sha256', $signature, getenv('APP_SECRET'));
+        return Str::after($payload['auth'] ?? '', ':') === hash_hmac('sha256', $signature, app_secret());
     }
 }

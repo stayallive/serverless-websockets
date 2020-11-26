@@ -52,7 +52,7 @@ class PusherProtocolMessageHandler implements MessageHandler
     {
         $socketId = $this->channelManager->findSocketIdForConnection($this->event->getConnectionId());
 
-        return $this->channelManager->findOrCreateChannel($this->payload['data']['channel'])
+        return $this->channelManager->findOrNewChannel($this->payload['data']['channel'])
                                     ->subscribe($this->event->getConnectionId(), $socketId, $this->payload['data'] ?? []);
     }
 
@@ -61,7 +61,7 @@ class PusherProtocolMessageHandler implements MessageHandler
      */
     protected function unsubscribe(): Message
     {
-        $this->channelManager->findOrCreateChannel($this->payload['data']['channel'])
+        $this->channelManager->findOrNewChannel($this->payload['data']['channel'])
                              ->unsubscribe($this->event->getConnectionId());
 
         // Because of API Gateway limitations we are required to respond with something, so we do with a simple message

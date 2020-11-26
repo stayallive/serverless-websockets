@@ -8,14 +8,19 @@ provider:
   apiGateway:
     shouldStartNameWithService: true
   environment:
-    APP_ID: 'sws'
-    APP_KEY: 'sws'
+    # Variables the app needs to operate
     APP_STAGE: ${opt:stage, self:provider.stage}
     APP_REGION: ${opt:region, self:provider.region}
-    APP_SECRET: 'AwGaqvwvZhhGZ3xpCKY7VKz9'
     APP_API_ID: !Ref "HttpApi"
     APP_WS_API_ID: !Ref "WebsocketsApi"
+    # Configure the Pusher protocol app ID, key and secret
+    APP_ID: 'sws'
+    APP_KEY: 'sws'
+    APP_SECRET: 'AwGaqvwvZhhGZ3xpCKY7VKz9'
+    # Configure the server to allow client events on authenticated channels
     APP_CLIENT_EVENTS: 'true'
+    # Deploy to /wave a example app using a presence channel
+    APP_WAVE_EXAMPLE_ENABLED: 'true'
   iamRoleStatements:
     - Effect: Allow
       Action:

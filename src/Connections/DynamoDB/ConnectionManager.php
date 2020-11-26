@@ -135,7 +135,7 @@ class ConnectionManager extends BaseConnectionManager
         return new $channelClass($channelName, $this->db, $result);
     }
 
-    public function findOrCreateChannel(string $channelName): AbstractChannel
+    public function findOrNewChannel(string $channelName): AbstractChannel
     {
         $channel = $this->findChannel($channelName);
 

@@ -1,26 +1,15 @@
 <?php
 
-namespace Stayallive\ServerlessWebSockets\Http\Controllers;
+namespace Stayallive\ServerlessWebSockets\Http\Controllers\API\Pusher;
 
 use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
-use Stayallive\ServerlessWebSockets\Connections\ConnectionManager;
 use Stayallive\ServerlessWebSockets\Connections\Channels\AbstractChannel;
 use Stayallive\ServerlessWebSockets\Connections\Channels\PresenceChannel;
 
 class FetchChannels extends Controller
 {
-    private ConnectionManager $connections;
-
-    public function __construct(ResponseFactoryInterface $responseFactory, ConnectionManager $connections)
-    {
-        parent::__construct($responseFactory);
-
-        $this->connections = $connections;
-    }
-
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $attributes  = [];
@@ -46,6 +35,10 @@ class FetchChannels extends Controller
 
                 if ($channel instanceof PresenceChannel && in_array('user_count', $attributes)) {
                     $info['user_count'] = $channel->userCount();
+                }
+
+                if (in_array('subscription_count', $attributes)) {
+                    $info['subscription_count'] = $channel->connectionCount();
                 }
 
                 return (object)$info;

@@ -14,7 +14,7 @@ class EnsureValidAppKey extends Middleware
     {
         $route = RouteContext::fromRequest($request)->getRoute();
 
-        if ($route instanceof Route && $route->getArgument('appId') === getenv('APP_ID')) {
+        if ($route instanceof Route && $route->getArgument('appId') === app_id()) {
             return $handler->handle($request);
         }
 

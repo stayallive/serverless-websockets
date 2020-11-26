@@ -18,8 +18,21 @@ class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
     }
 
 
+    public function userIds(): array
+    {
+        if (!$this->exists()) {
+            return [];
+        }
+
+        return array_keys($this->data['users']->getM());
+    }
+
     public function userCount(): int
     {
+        if (!$this->exists()) {
+            return 0;
+        }
+
         return count($this->data['users']->getM());
     }
 

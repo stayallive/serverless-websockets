@@ -4,5 +4,7 @@ namespace Stayallive\ServerlessWebSockets\Connections\Channels;
 
 interface PresenceChannel
 {
+    public function userIds(): array;
+
     public function userCount(): int;
 }

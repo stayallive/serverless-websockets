@@ -58,16 +58,28 @@ abstract class AbstractChannel extends BaseChannel
 
     public function connectionIds(): array
     {
+        if (!$this->exists()) {
+            return [];
+        }
+
         return array_keys($this->connections());
     }
 
     public function hasConnections(): bool
     {
+        if (!$this->exists()) {
+            return false;
+        }
+
         return !empty($this->connections());
     }
 
     public function connectionCount(): int
     {
+        if (!$this->exists()) {
+            return 0;
+        }
+
         return count($this->connections());
     }
 

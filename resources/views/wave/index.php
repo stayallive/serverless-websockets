@@ -145,11 +145,11 @@
                 wsPath:            '/<?php echo app_stage(); ?>',
                 forceTLS:          true,
                 enableStats:       false,
-                authEndpoint:      '/pusher/auth',
+                authEndpoint:      '/wave/pusher/auth',
                 enabledTransports: ['ws'],
             });
 
-            const presenceChannel = pusher.subscribe('presence-test');
+            const presenceChannel = pusher.subscribe('presence-internal-wave');
 
             function updateCounter() {
                 // Extract one to not count the current browser
@@ -169,12 +169,12 @@
             presenceChannel.bind('pusher:subscription_succeeded', updateCounter);
             presenceChannel.bind('pusher:member_added', updateCounter);
             presenceChannel.bind('pusher:member_removed', updateCounter);
-            presenceChannel.bind('client-hi', wave);
+            presenceChannel.bind('client-wave', wave);
 
             document.getElementById('say-hi').addEventListener('click', (e) => {
                 e.preventDefault();
 
-                presenceChannel.trigger('client-hi');
+                presenceChannel.trigger('client-wave');
 
                 wave();
             });
