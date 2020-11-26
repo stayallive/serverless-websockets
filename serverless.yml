@@ -14,8 +14,8 @@ provider:
     APP_API_ID: !Ref "HttpApi"
     APP_WS_API_ID: !Ref "WebsocketsApi"
     # Configure the Pusher protocol app ID, key and secret
-    APP_ID: 'sws'
-    APP_KEY: 'sws'
+    APP_ID: 'serverless-websockets'
+    APP_KEY: '7fsfybjP3MTy7bVV6MWctRqJ'
     APP_SECRET: 'AwGaqvwvZhhGZ3xpCKY7VKz9'
     # Configure the server to allow client events on authenticated channels
     APP_CLIENT_EVENTS: 'true'
@@ -57,6 +57,7 @@ functions:
 
 resources:
   Resources:
+    # This table is used to have a reference to all connected clients and their assigned socket ID's
     DynamoDBConnectionPoolTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -68,6 +69,7 @@ resources:
         KeySchema:
           - AttributeName: connection-id
             KeyType: HASH
+    # This table is used to have a reference to all occupied channels and their connected clients and optional user info
     DynamoDBChannelsTable:
       Type: AWS::DynamoDB::Table
       Properties:
