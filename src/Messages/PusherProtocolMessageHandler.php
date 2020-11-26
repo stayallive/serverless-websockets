@@ -26,7 +26,7 @@ class PusherProtocolMessageHandler implements MessageHandler
     /**
      * @uses ping, connect, subscribe, unsubscribe
      */
-    public function respond(): array
+    public function respond(): Message
     {
         $eventName = Str::camel(Str::after($this->payload['event'], ':'));
 
@@ -40,7 +40,7 @@ class PusherProtocolMessageHandler implements MessageHandler
     /**
      * @see https://pusher.com/docs/channels/library_auth_reference/pusher-websockets-protocol#ping-and-pong-messages
      */
-    private function ping(): array
+    private function ping(): Message
     {
         return $this->buildPusherEventMessage('pusher:pong');
     }
@@ -48,7 +48,7 @@ class PusherProtocolMessageHandler implements MessageHandler
     /**
      * @see https://pusher.com/docs/channels/library_auth_reference/pusher-websockets-protocol#-pusher-subscribe-client-pusher-channels-
      */
-    protected function subscribe(): array
+    protected function subscribe(): Message
     {
         $socketId = $this->channelManager->findSocketIdForConnection($this->event->getConnectionId());
 
@@ -59,9 +59,12 @@ class PusherProtocolMessageHandler implements MessageHandler
     /**
      * @see https://pusher.com/docs/channels/library_auth_reference/pusher-websockets-protocol#-pusher-unsubscribe-client-pusher-channels-
      */
-    protected function unsubscribe(): array
+    protected function unsubscribe(): Message
     {
-        return $this->channelManager->findOrCreateChannel($this->payload['data']['channel'])
-                                    ->unsubscribe($this->event->getConnectionId());
+        $this->channelManager->findOrCreateChannel($this->payload['data']['channel'])
+                             ->unsubscribe($this->event->getConnectionId());
+
+        // Because of API Gateway limitations we are required to respond with something, so we do with a simple message
+        return $this->buildPusherAcknowledgeMessage();
     }
 }

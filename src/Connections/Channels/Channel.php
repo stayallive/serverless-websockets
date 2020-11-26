@@ -2,11 +2,13 @@
 
 namespace Stayallive\ServerlessWebSockets\Connections\Channels;
 
+use Stayallive\ServerlessWebSockets\Messages\Message;
+
 interface Channel
 {
-    public function subscribe(string $connectionId, string $socketId, array $payload): array;
+    public function subscribe(string $connectionId, string $socketId, array $payload): Message;
 
-    public function unsubscribe(string $connectionId): array;
+    public function unsubscribe(string $connectionId): void;
 
 
     public function hasConnections(): bool;

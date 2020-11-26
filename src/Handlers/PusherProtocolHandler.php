@@ -32,22 +32,20 @@ class PusherProtocolHandler extends WebsocketHandler
 
     private function onMessage(WebsocketEvent $event, Context $context): HttpResponse
     {
-        $response = MessageHandlerFactory::fromSocketEvent($event, $this->channelManager)->respond();
-
-        return new HttpResponse(json_encode($response));
+        return MessageHandlerFactory::fromSocketEvent($event, $this->channelManager)->respond()->toGatewayResponse();
     }
 
     private function onConnect(WebsocketEvent $event, Context $context): HttpResponse
     {
         $this->channelManager->connect($event);
 
-        return new HttpResponse('connect');
+        return new HttpResponse('ok');
     }
 
     private function onDisconnect(WebsocketEvent $event, Context $context): HttpResponse
     {
         $this->channelManager->disconnect($event);
 
-        return new HttpResponse('disconnect');
+        return new HttpResponse('ok');
     }
 }

@@ -4,12 +4,13 @@ namespace Stayallive\ServerlessWebSockets\Connections\DynamoDB\Channels;
 
 use AsyncAws\DynamoDb\Input\UpdateItemInput;
 use AsyncAws\DynamoDb\ValueObject\AttributeValue;
+use Stayallive\ServerlessWebSockets\Messages\Message;
 use Stayallive\ServerlessWebSockets\Connections\DynamoDB\ConnectionManager;
 use Stayallive\ServerlessWebSockets\Connections\Channels\PresenceChannel as PresenceChannelInterface;
 
 class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
 {
-    public function subscribe(string $connectionId, string $socketId, array $payload): array
+    public function subscribe(string $connectionId, string $socketId, array $payload): Message
     {
         parent::subscribe($connectionId, $socketId, $payload);
 

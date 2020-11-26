@@ -23,7 +23,7 @@ class PusherClientMessageHandler implements MessageHandler
         $this->channelManager = $channelManager;
     }
 
-    public function respond(): array
+    public function respond(): Message
     {
         if (getenv('APP_CLIENT_EVENTS') !== 'true') {
             return $this->buildPusherErrorMessage('Client events are not allowed');
@@ -43,6 +43,7 @@ class PusherClientMessageHandler implements MessageHandler
             $channel->broadcastToEveryoneExcept($this->payload['event'], $this->payload['data'] ?? [], $this->event->getConnectionId());
         }
 
+        // Because of API Gateway limitations we are required to respond with something, so we do with a simple message
         return $this->buildPusherAcknowledgeMessage();
     }
 }

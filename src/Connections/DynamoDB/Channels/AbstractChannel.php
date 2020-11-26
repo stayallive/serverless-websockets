@@ -7,6 +7,7 @@ use AsyncAws\DynamoDb\Input\DeleteItemInput;
 use AsyncAws\DynamoDb\Input\UpdateItemInput;
 use AsyncAws\Core\Exception\Http\HttpException;
 use AsyncAws\DynamoDb\ValueObject\AttributeValue;
+use Stayallive\ServerlessWebSockets\Messages\Message;
 use Stayallive\ServerlessWebSockets\Messages\BuildsPusherMessages;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Stayallive\ServerlessWebSockets\Connections\DynamoDB\ConnectionManager;
@@ -32,7 +33,7 @@ abstract class AbstractChannel extends BaseChannel
     }
 
 
-    public function subscribe(string $connectionId, string $socketId, array $payload): array
+    public function subscribe(string $connectionId, string $socketId, array $payload): Message
     {
         $this->createEmptyChannelIfNeeded();
 
@@ -43,7 +44,7 @@ abstract class AbstractChannel extends BaseChannel
         return $this->buildPusherChannelMessage($this->name, 'pusher_internal:subscription_succeeded');
     }
 
-    public function unsubscribe(string $connectionId): array
+    public function unsubscribe(string $connectionId): void
     {
         if ($this->exists()) {
             $this->unsubscribeOnConnectionPool($connectionId);
@@ -52,8 +53,6 @@ abstract class AbstractChannel extends BaseChannel
 
             $this->cleanupChannelIfEmpty();
         }
-
-        return $this->buildPusherAcknowledgeMessage();
     }
 
 

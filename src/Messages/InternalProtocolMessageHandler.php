@@ -24,9 +24,11 @@ class InternalProtocolMessageHandler implements MessageHandler
     }
 
     /**
+     * @return \Stayallive\ServerlessWebSockets\Messages\Message
+     *
      * @uses connect
      */
-    public function respond(): array
+    public function respond(): Message
     {
         $eventName = Str::camel(Str::after($this->payload['event'], ':'));
 
@@ -42,7 +44,7 @@ class InternalProtocolMessageHandler implements MessageHandler
      *
      * You cannot respond to the connect event so we need the client to "request" a connect.
      */
-    private function connect(): array
+    private function connect(): Message
     {
         $socketId = $this->connectionManager->findSocketIdForConnection($this->event->getConnectionId());
 

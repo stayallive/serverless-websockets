@@ -3,6 +3,7 @@
 namespace Stayallive\ServerlessWebSockets\Connections\Channels;
 
 use Illuminate\Support\Str;
+use Stayallive\ServerlessWebSockets\Messages\Message;
 
 abstract class AbstractChannel implements Channel
 {
@@ -14,9 +15,9 @@ abstract class AbstractChannel implements Channel
     }
 
 
-    abstract public function subscribe(string $connectionId, string $socketId, array $payload): array;
+    abstract public function subscribe(string $connectionId, string $socketId, array $payload): Message;
 
-    abstract public function unsubscribe(string $connectionId): array;
+    abstract public function unsubscribe(string $connectionId): void;
 
 
     abstract public function hasConnections(): bool;
