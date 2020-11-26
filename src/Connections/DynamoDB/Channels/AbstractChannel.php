@@ -104,6 +104,8 @@ abstract class AbstractChannel extends BaseChannel
             } catch (ClientExceptionInterface $e) {
                 // Handle disconnected clients that were not cleaned up correctly
                 if ($e->getResponse()->getStatusCode() === 410) {
+                    echo "Found a stale connection in channel:{$this->name} connection:{$connectionId}, unsubscribing." . PHP_EOL;
+
                     $this->unsubscribe($connectionId);
 
                     continue;
