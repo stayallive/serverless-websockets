@@ -1,0 +1,67 @@
+# Serverless WebSockets
+
+Brings the power of WebSockets to serverless. Tries to achieve drop-in Pusher replacement.
+
+This project is heavily inspired by [Laravel WebSockets](https://github.com/beyondcode/laravel-websockets).
+
+## Limitations
+
+This project uses the AWS API Gateway to provide it's WebSocket connection. The limitation with using the API Gateway is that you cannot specify a WebSocket endpoint yourself, it's defined by AWS and defaults to `wss://<gateway-endpoint>/<stage-name>`. This has 2 drawbacks:
+
+- Only one application per deployment, since there is no other way to specify the application ID in the Pusher SDK except in the WebSocket url which we cannot modify
+- We need to "message" the Pusher JS SDK (and other SDK that handle the WebSocket connection) a bit to use the correct WebSocket endpoint
+
+Another limitation is that we cannot respond to the initial connection from the API Gateway so we need the client to send an event so we can respond with the Pusher protocol handshake.
+
+## Pusher JS SDK
+
+This is code is tested with version `7.0.1` of the Pusher JS SDK, keep in mind that upgrading to newer Pusher JS SDK version might break this workaround.
+
+```js
+// Pusher has it's own socket URL structure that doesn't play nice with API Gateway
+// so we patch the method that generates the wss URL and return our own WebSocket URL
+Pusher.Runtime.Transports.ws.hooks.urls.getInitial = () => {
+    return 'wss://YOUR_API_GATEWAY_ENDPOINT/YOUR_API_GATEWAY_STAGE_NAME';
+};
+
+// We also need to get the socket to workaround another API Gateway limitation
+const socketRetriever = Pusher.Runtime.Transports.ws.hooks.getSocket;
+
+// We need to capture the actual WebSocket created by Pusher so we can send an initital message
+Pusher.Runtime.Transports.ws.hooks.getSocket = (e) => {
+    // We let Pusher create the WebSocket
+    const socket = socketRetriever(e);
+
+    // We listen for when the WebSocket opens so we can push our connect message
+    // We don't use `socket.onopen` since Pusher SDK immeditaly wil overwrite it
+    socket.addEventListener('open', () => {
+        // Send our initial "handshake" event so we can respond with the Pusher handshake message
+        // without this handshake message from the server the SDK will timeout the connection and reconnect
+        socket.send(JSON.stringify({'event': 'internal:connect'}));
+    });
+
+    // Continue to let Pusher do it's thing
+    return socket;
+};
+
+// The app key can be anything since it's unused (no support for multiple apps per deployment)
+const pusher = new Pusher('APP_KEY', {
+    forceTLS:          true,
+    enableStats:       false, // disable this since we do not accept the stats being sent
+    enabledTransports: ['ws'],
+});
+```
+
+## Security
+
+If you discover any security related issues, please email alex@bouma.dev instead of using the issue tracker.
+
+## Credits
+
+- [Alex Bouma](https://github.com/stayallive)
+- [All Contributors](../../contributors)
+- [All Contributors of Laravel WebSockets](https://github.com/beyondcode/laravel-websockets)
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
