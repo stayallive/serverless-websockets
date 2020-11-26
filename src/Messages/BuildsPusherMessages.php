@@ -41,4 +41,9 @@ trait BuildsPusherMessages
     {
         return $this->buildPusherMessage($event, $data, $channel);
     }
+
+    protected function buildPusherAcknowledgeMessage(): array
+    {
+        return $this->buildPusherMessage('internal:ack');
+    }
 }

@@ -39,6 +39,6 @@ class PusherClientMessageHandler implements MessageHandler
             $channel->broadcastToEveryoneExcept($this->payload['event'], $this->payload['data'] ?? [], $this->event->getConnectionId());
         }
 
-        return $this->buildPusherMessage('pusher:ack');
+        return $this->buildPusherAcknowledgeMessage();
     }
 }

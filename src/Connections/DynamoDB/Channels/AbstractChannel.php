@@ -53,7 +53,7 @@ abstract class AbstractChannel extends BaseChannel
             $this->cleanupChannelIfEmpty();
         }
 
-        return $this->buildPusherMessage('pusher:ack');
+        return $this->buildPusherAcknowledgeMessage();
     }
 
 
