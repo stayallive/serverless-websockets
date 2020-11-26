@@ -26,11 +26,15 @@ class PusherClientMessageHandler implements MessageHandler
     public function respond(): array
     {
         if (getenv('APP_CLIENT_EVENTS') !== 'true') {
-            return $this->buildPusherErrorMessage('Client events are not allowed.');
+            return $this->buildPusherErrorMessage('Client events are not allowed');
         }
 
         if (!Str::startsWith($this->payload['event'], 'client-')) {
-            return $this->buildPusherErrorMessage('Client events must be prefixed by client-.');
+            return $this->buildPusherErrorMessage('Client events must be prefixed by `client-`');
+        }
+
+        if (!$this->channelManager->isAuthenticatedChannel($this->payload['channel'])) {
+            return $this->buildPusherErrorMessage('Client event are only allowed on authenticated channels', 4009);
         }
 
         $channel = $this->channelManager->findChannel($this->payload['channel']);

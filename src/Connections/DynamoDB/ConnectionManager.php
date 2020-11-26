@@ -17,7 +17,7 @@ use Stayallive\ServerlessWebSockets\Connections\DynamoDB\Channels\PrivateChannel
 use Stayallive\ServerlessWebSockets\Connections\DynamoDB\Channels\PresenceChannel;
 use Stayallive\ServerlessWebSockets\Connections\ConnectionManager as BaseConnectionManager;
 
-class ConnectionManager implements BaseConnectionManager
+class ConnectionManager extends BaseConnectionManager
 {
     public const CHANNELS_TABLE        = 'serverless-websockets-channels';
     public const CONNECTION_POOL_TABLE = 'serverless-websockets-connection-pool';
