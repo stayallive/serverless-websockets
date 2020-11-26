@@ -4,7 +4,7 @@ provider:
   name: aws
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'eu-central-1'}
-  runtime: provided
+  runtime: provided.al2
   apiGateway:
     shouldStartNameWithService: true
   environment:
@@ -34,8 +34,7 @@ plugins:
 functions:
   api:
     handler: handlers/api.php
-    description: ''
-    timeout: 10
+    timeout: 28
     layers:
       - ${bref:layer.php-74-fpm}
     events:
