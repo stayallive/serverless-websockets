@@ -9,7 +9,7 @@ trait BuildsPusherMessages
         $message = new PusherMessage($event);
 
         if ($data !== null) {
-            $message->withData($data);
+            $message->withData(json_encode($data));
         }
 
         if ($channel !== null) {

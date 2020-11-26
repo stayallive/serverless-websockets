@@ -8,7 +8,7 @@ class PusherMessage implements Message
 {
     private string  $event;
     private ?string $channel = null;
-    private ?array  $data    = null;
+    private ?string $data    = null;
 
     public function __construct(string $event)
     {
@@ -22,7 +22,7 @@ class PusherMessage implements Message
         return $this;
     }
 
-    public function withData(array $data): self
+    public function withData(string $data): self
     {
         $this->data = $data;
 
@@ -36,7 +36,7 @@ class PusherMessage implements Message
         ];
 
         if ($this->data !== null) {
-            $message['data'] = json_encode($this->data);
+            $message['data'] = $this->data;
         }
 
         if ($this->channel !== null) {

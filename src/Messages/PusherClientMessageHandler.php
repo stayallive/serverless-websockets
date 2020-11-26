@@ -40,7 +40,7 @@ class PusherClientMessageHandler implements MessageHandler
         $channel = $this->channelManager->findChannel($this->payload['channel']);
 
         if ($channel !== null) {
-            $channel->broadcastToEveryoneExcept($this->payload['event'], $this->payload['data'] ?? [], $this->event->getConnectionId());
+            $channel->broadcastToEveryoneExcept($this->payload['event'], $this->payload['data'] ?? null, $this->event->getConnectionId());
         }
 
         // Because of API Gateway limitations we are required to respond with something, so we do with a simple message

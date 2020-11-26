@@ -18,7 +18,7 @@ interface Channel
     public function connectionIds(): array;
 
 
-    public function broadcast(string $event, ?array $data = null): void;
+    public function broadcast(string $event, $data = null): void;
 
-    public function broadcastToEveryoneExcept(string $event, ?array $data = null, ?string $exceptConnectionId = null): void;
+    public function broadcastToEveryoneExcept(string $event, $data = null, ?string $exceptConnectionId = null): void;
 }

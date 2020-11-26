@@ -34,10 +34,6 @@ class TriggerEvent extends Controller
             $this->response(400, 'Missing event name to broadcast.');
         }
 
-        if (!empty($trigger['data'])) {
-            $trigger['data'] = json_decode($trigger['data'], true);
-        }
-
         foreach ($trigger['channels'] as $channelName) {
             $channel = $this->connections->findChannel($channelName);
 

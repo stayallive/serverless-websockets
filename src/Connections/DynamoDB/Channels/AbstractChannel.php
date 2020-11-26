@@ -72,19 +72,23 @@ abstract class AbstractChannel extends BaseChannel
     }
 
 
-    public function broadcast(string $event, ?array $data = null): void
+    public function broadcast(string $event, $data = null): void
     {
         $this->broadcastToEveryoneExcept($event, $data);
     }
 
-    public function broadcastToEveryoneExcept(string $event, ?array $data = null, ?string $exceptConnectionId = null): void
+    public function broadcastToEveryoneExcept(string $event, $data = null, ?string $exceptConnectionId = null): void
     {
         $message = [
             'event'   => $event,
             'channel' => $this->name,
         ];
 
-        if (!empty($data)) {
+        if ($data !== null) {
+            if (is_array($data)) {
+                $data = json_encode($data);
+            }
+
             $message['data'] = $data;
         }
 

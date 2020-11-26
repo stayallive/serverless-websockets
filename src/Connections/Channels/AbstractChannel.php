@@ -27,9 +27,9 @@ abstract class AbstractChannel implements Channel
     abstract public function connectionIds(): array;
 
 
-    abstract public function broadcast(string $event, ?array $data = null): void;
+    abstract public function broadcast(string $event, $data = null): void;
 
-    abstract public function broadcastToEveryoneExcept(string $event, ?array $data = null, ?string $exceptConnectionId = null): void;
+    abstract public function broadcastToEveryoneExcept(string $event, $data = null, ?string $exceptConnectionId = null): void;
 
 
     protected function verifySignature(string $socketId, array $payload): bool
