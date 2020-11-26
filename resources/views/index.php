@@ -141,11 +141,11 @@
 
             // The app key can be anything since it's unused (no support for multiple apps per deployment)
             const pusher = new Pusher('<?php echo getenv('APP_KEY'); ?>', {
-                wsHost:            '<?php echo app_api_endpoint(); ?>',
+                wsHost:            '<?php echo app_ws_api_endpoint(); ?>',
                 wsPath:            '/<?php echo app_stage(); ?>',
                 forceTLS:          true,
                 enableStats:       false,
-                authEndpoint:      '/<?php echo app_stage(); ?>/pusher/auth',
+                authEndpoint:      '/pusher/auth',
                 enabledTransports: ['ws'],
             });
 

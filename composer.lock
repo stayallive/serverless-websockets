@@ -4,66 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "306f950c492c527f277a068056faf541",
+    "content-hash": "73888aeeb40945b238dfc5821ba78cf4",
     "packages": [
-        {
-            "name": "async-aws/cloud-formation",
-            "version": "1.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/async-aws/cloud-formation.git",
-                "reference": "ad3e58942eafdef8472b5e55ca70b4667d6c9fd7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/async-aws/cloud-formation/zipball/ad3e58942eafdef8472b5e55ca70b4667d6c9fd7",
-                "reference": "ad3e58942eafdef8472b5e55ca70b4667d6c9fd7",
-                "shasum": ""
-            },
-            "require": {
-                "async-aws/core": "^1.2",
-                "ext-filter": "*",
-                "ext-simplexml": "*",
-                "php": "^7.2.5 || ^8.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.1-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "AsyncAws\\CloudFormation\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "CloudFormation client, part of the AWS SDK provided by AsyncAws.",
-            "keywords": [
-                "amazon",
-                "async-aws",
-                "aws",
-                "cloud-formation",
-                "sdk"
-            ],
-            "support": {
-                "source": "https://github.com/async-aws/cloud-formation/tree/1.0.1"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/jderusse",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/nyholm",
-                    "type": "github"
-                }
-            ],
-            "time": "2020-11-21T10:41:37+00:00"
-        },
         {
             "name": "async-aws/core",
             "version": "1.6.0",
@@ -133,16 +75,16 @@
         },
         {
             "name": "async-aws/dynamo-db",
-            "version": "1.0.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/async-aws/dynamo-db.git",
-                "reference": "5571748dbb6db5f90692806f15810adb8b6647b0"
+                "reference": "a4808ec37d9da540f096465717324c8b2d393bdb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/async-aws/dynamo-db/zipball/5571748dbb6db5f90692806f15810adb8b6647b0",
-                "reference": "5571748dbb6db5f90692806f15810adb8b6647b0",
+                "url": "https://api.github.com/repos/async-aws/dynamo-db/zipball/a4808ec37d9da540f096465717324c8b2d393bdb",
+                "reference": "a4808ec37d9da540f096465717324c8b2d393bdb",
                 "shasum": ""
             },
             "require": {
@@ -151,10 +93,11 @@
                 "ext-json": "*",
                 "php": "^7.2.5 || ^8.0"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.4-dev"
+                    "dev-master": "1.1-dev"
                 }
             },
             "autoload": {
@@ -175,7 +118,7 @@
                 "sdk"
             ],
             "support": {
-                "source": "https://github.com/async-aws/dynamo-db/tree/1.0.0"
+                "source": "https://github.com/async-aws/dynamo-db/tree/master"
             },
             "funding": [
                 {
@@ -187,7 +130,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-11-10T12:39:52+00:00"
+            "time": "2020-11-26T09:49:32+00:00"
         },
         {
             "name": "async-aws/lambda",
@@ -248,40 +191,41 @@
         },
         {
             "name": "bref/bref",
-            "version": "0.5.33",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brefphp/bref.git",
-                "reference": "efe0598d5bad9ea6b9fedd7a7b81b23d5e7ab4f9"
+                "reference": "ac85c5acab71f603705366d0e3d154a7c4c7ce7d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brefphp/bref/zipball/efe0598d5bad9ea6b9fedd7a7b81b23d5e7ab4f9",
-                "reference": "efe0598d5bad9ea6b9fedd7a7b81b23d5e7ab4f9",
+                "url": "https://api.github.com/repos/brefphp/bref/zipball/ac85c5acab71f603705366d0e3d154a7c4c7ce7d",
+                "reference": "ac85c5acab71f603705366d0e3d154a7c4c7ce7d",
                 "shasum": ""
             },
             "require": {
-                "async-aws/cloud-formation": "^1.0",
                 "async-aws/lambda": "^1.0",
                 "ext-curl": "*",
                 "ext-json": "*",
                 "hollodotme/fast-cgi-client": "^3.0",
                 "mnapoli/silly": "^1.7",
                 "nyholm/psr7": "^1.2",
-                "php": ">=7.2.0",
+                "php": ">=7.3.0",
                 "psr/container": "^1.0",
                 "psr/http-message": "^1.0",
                 "psr/http-server-handler": "^1.0",
                 "riverline/multipart-parser": "^2.0.6",
                 "symfony/filesystem": "^3.1|^4.0|^5.0",
-                "symfony/process": "^3.3|^4.0|^5.0"
+                "symfony/http-client": "^4.4|^5.0",
+                "symfony/process": "^3.3|^4.0|^5.0",
+                "symfony/yaml": "^3.1|^4.0|^5.0"
             },
             "require-dev": {
-                "dms/phpunit-arraysubset-asserts": "^0.1|^0.2",
+                "dms/phpunit-arraysubset-asserts": "^0.2.0",
                 "doctrine/coding-standard": "^8.0",
                 "guzzlehttp/guzzle": "^6.3",
                 "phpstan/phpstan": "^0.12",
-                "phpunit/phpunit": "^8.0|^9.0"
+                "phpunit/phpunit": "^9.0"
             },
             "bin": [
                 "bref"
@@ -290,10 +234,7 @@
             "autoload": {
                 "psr-4": {
                     "Bref\\": "src"
-                },
-                "files": [
-                    "src/functions.php"
-                ]
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -310,7 +251,7 @@
             ],
             "support": {
                 "issues": "https://github.com/brefphp/bref/issues",
-                "source": "https://github.com/brefphp/bref/tree/0.5.33"
+                "source": "https://github.com/brefphp/bref/tree/1.0.0"
             },
             "funding": [
                 {
@@ -322,7 +263,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-11-21T18:05:13+00:00"
+            "time": "2020-11-25T09:40:59+00:00"
         },
         {
             "name": "doctrine/inflector",
@@ -421,20 +362,20 @@
         },
         {
             "name": "fig/http-message-util",
-            "version": "1.1.4",
+            "version": "1.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/http-message-util.git",
-                "reference": "3242caa9da7221a304b8f84eb9eaddae0a7cf422"
+                "reference": "9d94dc0154230ac39e5bf89398b324a86f63f765"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-message-util/zipball/3242caa9da7221a304b8f84eb9eaddae0a7cf422",
-                "reference": "3242caa9da7221a304b8f84eb9eaddae0a7cf422",
+                "url": "https://api.github.com/repos/php-fig/http-message-util/zipball/9d94dc0154230ac39e5bf89398b324a86f63f765",
+                "reference": "9d94dc0154230ac39e5bf89398b324a86f63f765",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.3 || ^7.0"
+                "php": "^5.3 || ^7.0 || ^8.0"
             },
             "suggest": {
                 "psr/http-message": "The package containing the PSR-7 interfaces"
@@ -457,7 +398,7 @@
             "authors": [
                 {
                     "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
+                    "homepage": "https://www.php-fig.org/"
                 }
             ],
             "description": "Utility classes and constants for use with PSR-7 (psr/http-message)",
@@ -471,9 +412,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-fig/http-message-util/issues",
-                "source": "https://github.com/php-fig/http-message-util/tree/1.1.4"
+                "source": "https://github.com/php-fig/http-message-util/tree/1.1.5"
             },
-            "time": "2020-02-05T20:36:27+00:00"
+            "time": "2020-11-24T22:02:12+00:00"
         },
         {
             "name": "hollodotme/fast-cgi-client",
@@ -547,16 +488,16 @@
         },
         {
             "name": "illuminate/collections",
-            "version": "v8.15.0",
+            "version": "v8.16.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/collections.git",
-                "reference": "e61e796ff98e19eac5e6735ea6abfa66f4a2f6db"
+                "reference": "c7d7d0a458bfcc2a00fd892a4dee3c41197abc0d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/collections/zipball/e61e796ff98e19eac5e6735ea6abfa66f4a2f6db",
-                "reference": "e61e796ff98e19eac5e6735ea6abfa66f4a2f6db",
+                "url": "https://api.github.com/repos/illuminate/collections/zipball/c7d7d0a458bfcc2a00fd892a4dee3c41197abc0d",
+                "reference": "c7d7d0a458bfcc2a00fd892a4dee3c41197abc0d",
                 "shasum": ""
             },
             "require": {
@@ -597,20 +538,20 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2020-10-27T15:20:30+00:00"
+            "time": "2020-11-23T01:20:25+00:00"
         },
         {
             "name": "illuminate/contracts",
-            "version": "v8.15.0",
+            "version": "v8.16.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/contracts.git",
-                "reference": "d9e6a156efb8332dcce427b7d1ccd2706609bfa5"
+                "reference": "a73835aad399da42e88217bdbb5e1e4c1e668807"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/contracts/zipball/d9e6a156efb8332dcce427b7d1ccd2706609bfa5",
-                "reference": "d9e6a156efb8332dcce427b7d1ccd2706609bfa5",
+                "url": "https://api.github.com/repos/illuminate/contracts/zipball/a73835aad399da42e88217bdbb5e1e4c1e668807",
+                "reference": "a73835aad399da42e88217bdbb5e1e4c1e668807",
                 "shasum": ""
             },
             "require": {
@@ -645,11 +586,11 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2020-11-10T15:48:45+00:00"
+            "time": "2020-11-18T13:57:08+00:00"
         },
         {
             "name": "illuminate/macroable",
-            "version": "v8.15.0",
+            "version": "v8.16.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/macroable.git",
@@ -695,16 +636,16 @@
         },
         {
             "name": "illuminate/support",
-            "version": "v8.15.0",
+            "version": "v8.16.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/support.git",
-                "reference": "b43fdf15eb999bce30ab9e22e8293716170c54f9"
+                "reference": "f67ddf297fcba7768b428bfe4c9c690b41673344"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/support/zipball/b43fdf15eb999bce30ab9e22e8293716170c54f9",
-                "reference": "b43fdf15eb999bce30ab9e22e8293716170c54f9",
+                "url": "https://api.github.com/repos/illuminate/support/zipball/f67ddf297fcba7768b428bfe4c9c690b41673344",
+                "reference": "f67ddf297fcba7768b428bfe4c9c690b41673344",
                 "shasum": ""
             },
             "require": {
@@ -758,7 +699,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2020-11-17T14:53:20+00:00"
+            "time": "2020-11-19T17:43:32+00:00"
         },
         {
             "name": "mnapoli/silly",
@@ -3536,6 +3477,81 @@
             "time": "2020-09-28T13:05:58+00:00"
         },
         {
+            "name": "symfony/yaml",
+            "version": "v5.1.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/yaml.git",
+                "reference": "f284e032c3cefefb9943792132251b79a6127ca6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/f284e032c3cefefb9943792132251b79a6127ca6",
+                "reference": "f284e032c3cefefb9943792132251b79a6127ca6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.5",
+                "symfony/deprecation-contracts": "^2.1",
+                "symfony/polyfill-ctype": "~1.8"
+            },
+            "conflict": {
+                "symfony/console": "<4.4"
+            },
+            "require-dev": {
+                "symfony/console": "^4.4|^5.0"
+            },
+            "suggest": {
+                "symfony/console": "For validating YAML files using the lint command"
+            },
+            "bin": [
+                "Resources/bin/yaml-lint"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Yaml\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Yaml Component",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/yaml/tree/v5.1.8"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-10-24T12:03:25+00:00"
+        },
+        {
             "name": "voku/portable-ascii",
             "version": "1.5.6",
             "source": {
@@ -4618,7 +4634,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "async-aws/dynamo-db": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

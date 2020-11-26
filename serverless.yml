@@ -13,7 +13,7 @@ provider:
     APP_STAGE: ${opt:stage, self:provider.stage}
     APP_REGION: ${opt:region, self:provider.region}
     APP_SECRET: 'AwGaqvwvZhhGZ3xpCKY7VKz9'
-    APP_API_ID: !Ref "ApiGatewayRestApi"
+    APP_API_ID: !Ref "HttpApi"
     APP_WS_API_ID: !Ref "WebsocketsApi"
     APP_CLIENT_EVENTS: 'true'
   iamRoleStatements:
@@ -25,8 +25,8 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - { "Fn::GetAtt": [ "DynamoDBConnectionPoolTable", "Arn" ] }
         - { "Fn::GetAtt": [ "DynamoDBChannelsTable", "Arn" ] }
+        - { "Fn::GetAtt": [ "DynamoDBConnectionPoolTable", "Arn" ] }
 
 plugins:
   - ./vendor/bref/bref
@@ -39,8 +39,7 @@ functions:
     layers:
       - ${bref:layer.php-74-fpm}
     events:
-      - http: 'ANY /'
-      - http: 'ANY /{proxy+}'
+      - httpApi: '*'
   websocket:
     handler: handlers/websocket.php
     layers:
