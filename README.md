@@ -1,6 +1,6 @@
-<p style="font-size: 20px; text-align: center; font-weight: bold;">
-    ⚠️ Please do not use this in production yet, use it at your own risk! ⚠️
-</p>
+<h3 align="center">
+    <b>⚠️ Please do not use this in production yet, use it at your own risk! ⚠️</b>
+</h3>
 
 ---
 
