@@ -23,17 +23,17 @@ provider:
     APP_SECRET: ${ssm:/serverless-websockets/${self:provider.stage}/app-secret}
 
     # Set the webhook target (https url) and the events that should be sent, leave emtpy to disable
-    APP_WEBHOOK_TARGET: ${ssm:/serverless-websockets/${self:provider.stage}/webhook-target}
+    APP_WEBHOOK_TARGET: ${ssm:/serverless-websockets/${self:provider.stage}/webhook-target, ''}
     # All available events: channel_occupied,channel_vacated,member_added,member_removed,client_event
     # For more info see: https://pusher.com/docs/channels/server_api/webhooks
     # Set the value to a comma seperated string, for example: channel_occupied,channel_vacated,client_event
-    APP_WEBHOOK_EVENTS: ${ssm:/serverless-websockets/${self:provider.stage}/webhook-events}
+    APP_WEBHOOK_EVENTS: ${ssm:/serverless-websockets/${self:provider.stage}/webhook-events, ''}
 
     # Configure the server to allow client events on authenticated channels
-    APP_CLIENT_EVENTS: ${ssm:/serverless-websockets/${self:provider.stage}/client-events-enabled}
+    APP_CLIENT_EVENTS: ${ssm:/serverless-websockets/${self:provider.stage}/client-events-enabled, 'false'}
 
     # Deploy to /wave a example app using a presence channel
-    APP_WAVE_EXAMPLE_ENABLED: ${ssm:/serverless-websockets/${self:provider.stage}/wave-example-enabled}
+    APP_WAVE_EXAMPLE_ENABLED: ${ssm:/serverless-websockets/${self:provider.stage}/wave-example-enabled, 'false'}
   iamRoleStatements:
     - Effect: Allow
       Action:

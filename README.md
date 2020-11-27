@@ -28,8 +28,9 @@ aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/app
 aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/app-key" --type String --value 'MY_APP_KEY'
 aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/app-secret" --type String --value 'MY_APP_SECRET'
 
-# You cannot set empty values so just leave not create the parameters if you don't want webhooks
-# Leave empty if you don't need webhooks
+### The parameters below are optional:
+
+# You cannot set empty values so just not create the parameters if you don't want webhooks
 aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/webhook-target" --type String --value ''
 # Add the events you want to receive: channel_occupied,channel_vacated,member_added,member_removed,client_event
 aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/webhook-events" --type String --value ''
