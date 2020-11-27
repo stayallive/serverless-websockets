@@ -59,6 +59,7 @@ functions:
       - ${bref:layer.php-74-fpm}
     events:
       - httpApi: '*'
+    description: 'Serverless Websockets API'
   websocket:
     handler: handlers/websocket.php
     layers:
@@ -69,6 +70,7 @@ functions:
       - websocket:
           route: $default
           routeResponseSelectionExpression: $default
+    description: 'Serverless Websockets WS'
   webhook:
     handler: handlers/webhook.php
     layers:
@@ -79,6 +81,7 @@ functions:
       - sqs:
           arn: !GetAtt "SQSWebhookQueue.Arn"
           batchSize: 1
+    description: 'Serverless Websockets Webhook'
 
 resources:
   Resources:
