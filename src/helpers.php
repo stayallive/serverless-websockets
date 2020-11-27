@@ -1,8 +1,13 @@
 <?php
 
+use AsyncAws\Sqs\SqsClient;
 use Illuminate\Support\Str;
 use Bref\Websocket\SimpleWebsocketClient;
+use AsyncAws\Sqs\Input\SendMessageRequest;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\RetryableHttpClient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 
 function get_required_env_var(string $name)
 {
@@ -14,6 +19,7 @@ function get_required_env_var(string $name)
 
     return $value;
 }
+
 
 function app_id(): string
 {
@@ -40,6 +46,11 @@ function app_region(): string
     return get_required_env_var('APP_REGION');
 }
 
+function app_sqs_url(): string
+{
+    return get_required_env_var('APP_SQS_URL');
+}
+
 function app_ws_api_id(): string
 {
     return get_required_env_var('APP_WS_API_ID');
@@ -50,6 +61,7 @@ function app_ws_api_endpoint(): string
     return sprintf('%s.execute-api.%s.amazonaws.com', app_ws_api_id(), app_region());
 }
 
+
 function wave_example_enabled(): bool
 {
     return get_required_env_var('APP_WAVE_EXAMPLE_ENABLED') === 'true';
@@ -58,6 +70,52 @@ function wave_example_enabled(): bool
 function client_events_enabled(): bool
 {
     return get_required_env_var('APP_CLIENT_EVENTS') === 'true';
+}
+
+
+function queue_webhook(string $event, array $data = []): void
+{
+    if (!webhook_event_enabled($event)) {
+        return;
+    }
+
+    sqs_client()->sendMessage(new SendMessageRequest([
+        'QueueUrl'    => app_sqs_url(),
+        'MessageBody' => json_encode([
+            'action' => 'send_webhook',
+            'time'   => time(),
+            'event'  => array_merge([
+                'name' => $event,
+            ], $data),
+        ]),
+    ]));
+}
+
+function webhook_target(): string
+{
+    return getenv('APP_WEBHOOK_TARGET') ?: '';
+}
+
+function webhook_event_enabled(string $event): bool
+{
+    if (!webhook_events_enabled()) {
+        return false;
+    }
+
+    $enabled = explode(',', getenv('APP_WEBHOOK_EVENTS') ?: '');
+
+    return in_array($event, $enabled);
+}
+
+function webhook_events_enabled(): bool
+{
+    return !empty(webhook_target());
+}
+
+
+function sqs_client(): SqsClient
+{
+    return new SqsClient;
 }
 
 function socket_client(): SimpleWebsocketClient
@@ -75,6 +133,31 @@ function socket_client(): SimpleWebsocketClient
 
     return $client;
 }
+
+function webhook_client(): HttpClientInterface
+{
+    // This configuration will retry 3 times with the following delays:
+    // #0: 0ms
+    // #1: 250ms
+    // #2: 2.5s
+    // #3: 25s
+    return new RetryableHttpClient(
+        HttpClient::create([
+            'timeout'       => 15,
+            'max_redirects' => 3,
+            'headers'       => [
+                'User-Agent' => 'ServerlessWebsockets-WebhookSlinger',
+            ],
+        ]),
+        new GenericRetryStrategy(
+            GenericRetryStrategy::DEFAULT_RETRY_STATUS_CODES,
+            250,
+            10.0
+        ),
+        3
+    );
+}
+
 
 function view(string $path): string
 {

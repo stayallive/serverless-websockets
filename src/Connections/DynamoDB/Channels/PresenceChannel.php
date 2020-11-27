@@ -36,6 +36,21 @@ class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
         return count($this->data['users']->getM());
     }
 
+    public function findUserIdForConnectionId(string $connectionId): ?string
+    {
+        if (!$this->exists()) {
+            return null;
+        }
+
+        $userInfo = $this->data['connections']->getM()[$connectionId] ?? null;
+
+        if ($userInfo === null) {
+            return null;
+        }
+
+        return $userInfo->getM()['user-id']->getS();
+    }
+
 
     protected function addConnectionForConnectionId(string $connectionId, string $socketId, array $payload): void
     {
@@ -75,6 +90,8 @@ class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
                 ['user_id' => $userId, 'user_info' => $userInfo],
                 $connectionId
             );
+
+            queue_webhook('member_added', ['channel' => $this->name, 'user_id' => $userId]);
         }
     }
 
@@ -88,6 +105,8 @@ class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
                 ['user_id' => $userId],
                 $connectionId
             );
+
+            queue_webhook('member_removed', ['channel' => $this->name, 'user_id' => $userId]);
 
             $result = $this->db->updateItem(new UpdateItemInput([
                 'TableName'                => ConnectionManager::CHANNELS_TABLE,

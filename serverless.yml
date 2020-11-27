@@ -12,15 +12,26 @@ provider:
     APP_STAGE: ${opt:stage, self:provider.stage}
     APP_REGION: ${opt:region, self:provider.region}
     APP_API_ID: !Ref "HttpApi"
+    APP_SQS_URL: !Ref "SQSWebhookQueue"
     APP_WS_API_ID: !Ref "WebsocketsApi"
+
     # Configure the Pusher protocol app ID, key and secret
-    APP_ID: 'serverless-websockets'
-    APP_KEY: '7fsfybjP3MTy7bVV6MWctRqJ'
-    APP_SECRET: 'AwGaqvwvZhhGZ3xpCKY7VKz9'
+    APP_ID: ${ssm:/serverless-websockets/app-id}
+    APP_KEY: ${ssm:/serverless-websockets/app-key}
+    APP_SECRET: ${ssm:/serverless-websockets/app-secret}
+
+    # Set the webhook target (https url) and the events that should be sent, leave emtpy to disable
+    APP_WEBHOOK_TARGET: ${ssm:/serverless-websockets/webhook-target}
+    # All available events: channel_occupied,channel_vacated,member_added,member_removed,client_event
+    # For more info see: https://pusher.com/docs/channels/server_api/webhooks
+    # Set the value to a comma seperated string, for example: channel_occupied,channel_vacated,client_event
+    APP_WEBHOOK_EVENTS: ${ssm:/serverless-websockets/webhook-events}
+
     # Configure the server to allow client events on authenticated channels
-    APP_CLIENT_EVENTS: 'true'
+    APP_CLIENT_EVENTS: ${ssm:/serverless-websockets/client-events-enabled}
+
     # Deploy to /wave a example app using a presence channel
-    APP_WAVE_EXAMPLE_ENABLED: 'true'
+    APP_WAVE_EXAMPLE_ENABLED: ${ssm:/serverless-websockets/wave-example-enabled}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -30,11 +41,13 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - { "Fn::GetAtt": [ "DynamoDBChannelsTable", "Arn" ] }
-        - { "Fn::GetAtt": [ "DynamoDBConnectionPoolTable", "Arn" ] }
-
-plugins:
-  - ./vendor/bref/bref
+        - !GetAtt "DynamoDBChannelsTable.Arn"
+        - !GetAtt "DynamoDBConnectionPoolTable.Arn"
+    - Effect: Allow
+      Action:
+        - sqs:SendMessage
+      Resource:
+        - !GetAtt "SQSWebhookQueue.Arn"
 
 functions:
   api:
@@ -54,6 +67,16 @@ functions:
       - websocket:
           route: $default
           routeResponseSelectionExpression: $default
+  webhook:
+    handler: handlers/webhook.php
+    layers:
+      - ${bref:layer.php-74}
+    timeout: 300
+    reservedConcurrency: 10
+    events:
+      - sqs:
+          arn: !GetAtt "SQSWebhookQueue.Arn"
+          batchSize: 1
 
 resources:
   Resources:
@@ -81,6 +104,18 @@ resources:
         KeySchema:
           - AttributeName: channel-id
             KeyType: HASH
+    # This queue is used to asynchronously handle sending webhooks
+    SQSWebhookQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        # Wait this amount of time before allowing a message to become visible again to other workers
+        VisibilityTimeout: 360
+        # We retry up to 4 times this way although we should have HTTP failures be handled inside the Lambda
+        # and try to never fail the execution so we don't hammer the webhook target with a large amount of events
+        MessageRetentionPeriod: 1440
+
+plugins:
+  - ./vendor/bref/bref
 
 package:
   exclude:

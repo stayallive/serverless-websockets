@@ -13,7 +13,7 @@ abstract class ConnectionManager
     abstract public function disconnect(WebsocketEvent $event): void;
 
 
-    abstract public function findSocketIdForConnection(string $connectionId): ?string;
+    abstract public function findSocketIdForConnectionId(string $connectionId): ?string;
 
 
     abstract public function channels(): array;

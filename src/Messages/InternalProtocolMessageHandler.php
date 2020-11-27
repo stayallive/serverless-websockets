@@ -46,7 +46,7 @@ class InternalProtocolMessageHandler implements MessageHandler
      */
     private function connect(): Message
     {
-        $socketId = $this->connectionManager->findSocketIdForConnection($this->event->getConnectionId());
+        $socketId = $this->connectionManager->findSocketIdForConnectionId($this->event->getConnectionId());
 
         if ($socketId === null) {
             return $this->buildPusherErrorMessage('Socket not registered.', 4200);

@@ -50,7 +50,7 @@ class PusherProtocolMessageHandler implements MessageHandler
      */
     protected function subscribe(): Message
     {
-        $socketId = $this->channelManager->findSocketIdForConnection($this->event->getConnectionId());
+        $socketId = $this->channelManager->findSocketIdForConnectionId($this->event->getConnectionId());
 
         return $this->channelManager->findOrNewChannel($this->payload['data']['channel'])
                                     ->subscribe($this->event->getConnectionId(), $socketId, $this->payload['data'] ?? []);

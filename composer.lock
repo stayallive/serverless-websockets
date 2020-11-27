@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "73888aeeb40945b238dfc5821ba78cf4",
+    "content-hash": "6f60b4a6a3f69fa01faa7da5fba36f71",
     "packages": [
         {
             "name": "async-aws/core",
@@ -118,7 +118,7 @@
                 "sdk"
             ],
             "support": {
-                "source": "https://github.com/async-aws/dynamo-db/tree/master"
+                "source": "https://github.com/async-aws/dynamo-db/tree/1.0.1"
             },
             "funding": [
                 {
@@ -130,7 +130,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-11-26T09:49:32+00:00"
+            "time": "2020-11-26T10:45:33+00:00"
         },
         {
             "name": "async-aws/lambda",
@@ -188,6 +188,63 @@
                 }
             ],
             "time": "2020-11-21T10:41:37+00:00"
+        },
+        {
+            "name": "async-aws/sqs",
+            "version": "1.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/async-aws/sqs.git",
+                "reference": "c0353acbbe093db4b20d1b31cc0b2f1e70b0945c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/async-aws/sqs/zipball/c0353acbbe093db4b20d1b31cc0b2f1e70b0945c",
+                "reference": "c0353acbbe093db4b20d1b31cc0b2f1e70b0945c",
+                "shasum": ""
+            },
+            "require": {
+                "async-aws/core": "^1.0",
+                "ext-simplexml": "*",
+                "php": "^7.2.5 || ^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AsyncAws\\Sqs\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "SQS client, part of the AWS SDK provided by AsyncAws.",
+            "keywords": [
+                "amazon",
+                "async-aws",
+                "aws",
+                "sdk",
+                "sqs"
+            ],
+            "support": {
+                "source": "https://github.com/async-aws/sqs/tree/1.3.2"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jderusse",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nyholm",
+                    "type": "github"
+                }
+            ],
+            "time": "2020-11-21T12:29:53+00:00"
         },
         {
             "name": "bref/bref",
@@ -2437,16 +2494,16 @@
         },
         {
             "name": "symfony/http-client",
-            "version": "v5.1.8",
+            "version": "v5.2.0-RC2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-client.git",
-                "reference": "97a6a1f9f5bb3a6094833107b58a72bc9a9165cc"
+                "reference": "b972e7cfa9ea90f67bec80c0530c14f674de0a41"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-client/zipball/97a6a1f9f5bb3a6094833107b58a72bc9a9165cc",
-                "reference": "97a6a1f9f5bb3a6094833107b58a72bc9a9165cc",
+                "url": "https://api.github.com/repos/symfony/http-client/zipball/b972e7cfa9ea90f67bec80c0530c14f674de0a41",
+                "reference": "b972e7cfa9ea90f67bec80c0530c14f674de0a41",
                 "shasum": ""
             },
             "require": {
@@ -2464,6 +2521,7 @@
                 "symfony/http-client-implementation": "1.1"
             },
             "require-dev": {
+                "amphp/amp": "^2.5",
                 "amphp/http-client": "^4.2.1",
                 "amphp/http-tunnel": "^1.0",
                 "amphp/socket": "^1.1",
@@ -2473,7 +2531,8 @@
                 "psr/http-client": "^1.0",
                 "symfony/dependency-injection": "^4.4|^5.0",
                 "symfony/http-kernel": "^4.4.13|^5.1.5",
-                "symfony/process": "^4.4|^5.0"
+                "symfony/process": "^4.4|^5.0",
+                "symfony/stopwatch": "^4.4|^5.0"
             },
             "type": "library",
             "autoload": {
@@ -2501,7 +2560,7 @@
             "description": "Symfony HttpClient component",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/http-client/tree/v5.1.8"
+                "source": "https://github.com/symfony/http-client/tree/v5.2.0-RC2"
             },
             "funding": [
                 {
@@ -2517,7 +2576,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-10-24T12:01:57+00:00"
+            "time": "2020-11-05T20:41:09+00:00"
         },
         {
             "name": "symfony/http-client-contracts",
@@ -4635,7 +4694,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "async-aws/dynamo-db": 20
+        "async-aws/dynamo-db": 20,
+        "symfony/http-client": 5
     },
     "prefer-stable": false,
     "prefer-lowest": false,

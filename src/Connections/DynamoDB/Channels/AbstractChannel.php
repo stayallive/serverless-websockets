@@ -35,6 +35,10 @@ abstract class AbstractChannel extends BaseChannel
 
     public function subscribe(string $connectionId, string $socketId, array $payload): Message
     {
+        if (!$this->hasConnections()) {
+            queue_webhook('channel_occupied', ['channel' => $this->name]);
+        }
+
         $this->createEmptyChannelIfNeeded();
 
         $this->subscribeOnConnectionPool($connectionId);
@@ -227,6 +231,8 @@ abstract class AbstractChannel extends BaseChannel
         }
 
         $this->data = null;
+
+        queue_webhook('channel_vacated', ['channel' => $this->name]);
     }
 
     protected function createEmptyChannelIfNeeded(): void

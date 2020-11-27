@@ -57,7 +57,7 @@ class ConnectionManager extends BaseConnectionManager
     }
 
 
-    public function findSocketIdForConnection(string $connectionId): ?string
+    public function findSocketIdForConnectionId(string $connectionId): ?string
     {
         $request = $this->db->getItem(new GetItemInput([
             'TableName'      => self::CONNECTION_POOL_TABLE,

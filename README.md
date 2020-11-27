@@ -1,8 +1,44 @@
+<p style="font-size: 20px; text-align: center; font-weight: bold;">
+    ⚠️ Please do not use this in production yet, use it at your own risk! ⚠️
+</p>
+
+---
+
 # Serverless WebSockets
 
 Brings the power of WebSockets to serverless. Tries to achieve drop-in Pusher replacement.
 
 This project is heavily inspired by [Laravel WebSockets](https://github.com/beyondcode/laravel-websockets).
+
+## Parameters
+
+The `serverless.yml` references AWS Systems Manager Parameter Store parameters to configure the application.
+
+Set your values using the AWS CLI (or create them manually through the AWS Console):
+
+```bash
+# Set this to the region you are deploying to
+REGION="eu-central-1"
+
+# Configuration that you need to share with your Pusher SDKs
+aws ssm put-parameter --region $REGION --name '/serverless-websockets/app-id' --type String --value 'MY_APP_ID'
+aws ssm put-parameter --region $REGION --name '/serverless-websockets/app-key' --type String --value 'MY_APP_KEY'
+aws ssm put-parameter --region $REGION --name '/serverless-websockets/app-secret' --type String --value 'MY_APP_SECRET'
+
+# You cannot set empty values so just leave not create the parameters if you don't want webhooks
+# Leave empty if you don't need webhooks
+aws ssm put-parameter --region $REGION --name '/serverless-websockets/webhook-target' --type String --value ''
+# Add the events you want to receive: channel_occupied,channel_vacated,member_added,member_removed,client_event
+aws ssm put-parameter --region $REGION --name '/serverless-websockets/webhook-events' --type String --value ''
+
+# Set to true if you want to allow clients to send event in authenticated channels
+aws ssm put-parameter --region $REGION --name '/serverless-websockets/client-events-enabled' --type String --value 'false'
+
+# There is a little example application on /wave you can use to see if everything is working as expected
+aws ssm put-parameter --region $REGION --name '/serverless-websockets/wave-example-enabled' --type String --value 'false'
+```
+
+Do not forget to re-deploy after updating the parameters.
 
 ## Limitations
 
@@ -13,7 +49,9 @@ This project uses the AWS API Gateway to provide it's WebSocket connection. The 
 
 Another limitation is that we cannot respond to the initial connection from the API Gateway so we need the client to send an event so we can respond with the Pusher protocol handshake.
 
-## Pusher JS SDK
+It's likely client SDKs (handling the WebSocket connection) needs changes to use the correct `wss` url.
+
+### Changes required for the Pusher JS SDK
 
 This is code is tested with version `7.0.1` of the Pusher JS SDK, keep in mind that upgrading to newer Pusher JS SDK version might break this workaround.
 
