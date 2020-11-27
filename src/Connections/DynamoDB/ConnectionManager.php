@@ -37,9 +37,6 @@ class ConnectionManager extends BaseConnectionManager
             'Item'      => [
                 'connection-id' => new AttributeValue(['S' => $event->getConnectionId()]),
                 'socket-id'     => new AttributeValue(['S' => $this->generateSocketId()]),
-                'api-id'        => new AttributeValue(['S' => $event->getApiId()]),
-                'region'        => new AttributeValue(['S' => $event->getRegion()]),
-                'stage'         => new AttributeValue(['S' => $event->getStage()]),
             ],
         ]));
     }

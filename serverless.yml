@@ -16,22 +16,22 @@ provider:
     APP_WS_API_ID: !Ref "WebsocketsApi"
 
     # Configure the Pusher protocol app ID, key and secret
-    APP_ID: ${ssm:/serverless-websockets/app-id}
-    APP_KEY: ${ssm:/serverless-websockets/app-key}
-    APP_SECRET: ${ssm:/serverless-websockets/app-secret}
+    APP_ID: ${ssm:/serverless-websockets/${self:provider.stage}/app-id}
+    APP_KEY: ${ssm:/serverless-websockets/${self:provider.stage}/app-key}
+    APP_SECRET: ${ssm:/serverless-websockets/${self:provider.stage}/app-secret}
 
     # Set the webhook target (https url) and the events that should be sent, leave emtpy to disable
-    APP_WEBHOOK_TARGET: ${ssm:/serverless-websockets/webhook-target}
+    APP_WEBHOOK_TARGET: ${ssm:/serverless-websockets/${self:provider.stage}/webhook-target}
     # All available events: channel_occupied,channel_vacated,member_added,member_removed,client_event
     # For more info see: https://pusher.com/docs/channels/server_api/webhooks
     # Set the value to a comma seperated string, for example: channel_occupied,channel_vacated,client_event
-    APP_WEBHOOK_EVENTS: ${ssm:/serverless-websockets/webhook-events}
+    APP_WEBHOOK_EVENTS: ${ssm:/serverless-websockets/${self:provider.stage}/webhook-events}
 
     # Configure the server to allow client events on authenticated channels
-    APP_CLIENT_EVENTS: ${ssm:/serverless-websockets/client-events-enabled}
+    APP_CLIENT_EVENTS: ${ssm:/serverless-websockets/${self:provider.stage}/client-events-enabled}
 
     # Deploy to /wave a example app using a presence channel
-    APP_WAVE_EXAMPLE_ENABLED: ${ssm:/serverless-websockets/wave-example-enabled}
+    APP_WAVE_EXAMPLE_ENABLED: ${ssm:/serverless-websockets/${self:provider.stage}/wave-example-enabled}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -84,7 +84,7 @@ resources:
     DynamoDBConnectionPoolTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: serverless-websockets-connection-pool
+        TableName: serverless-websockets-connection-pool-${self:provider.stage}
         BillingMode: 'PAY_PER_REQUEST'
         AttributeDefinitions:
           - AttributeName: connection-id
@@ -96,7 +96,7 @@ resources:
     DynamoDBChannelsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: serverless-websockets-channels
+        TableName: serverless-websockets-channels-${self:provider.stage}
         BillingMode: 'PAY_PER_REQUEST'
         AttributeDefinitions:
           - AttributeName: channel-id
@@ -108,6 +108,7 @@ resources:
     SQSWebhookQueue:
       Type: AWS::SQS::Queue
       Properties:
+        QueueName: serverless-websockets-webhooks-${self:provider.stage}
         # Wait this amount of time before allowing a message to become visible again to other workers
         VisibilityTimeout: 360
         # We retry up to 4 times this way although we should have HTTP failures be handled inside the Lambda

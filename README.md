@@ -20,22 +20,25 @@ Set your values using the AWS CLI (or create them manually through the AWS Conso
 # Set this to the region you are deploying to
 REGION="eu-central-1"
 
+# You will need to set the parameter for each stage
+STAGE="dev"
+
 # Configuration that you need to share with your Pusher SDKs
-aws ssm put-parameter --region $REGION --name '/serverless-websockets/app-id' --type String --value 'MY_APP_ID'
-aws ssm put-parameter --region $REGION --name '/serverless-websockets/app-key' --type String --value 'MY_APP_KEY'
-aws ssm put-parameter --region $REGION --name '/serverless-websockets/app-secret' --type String --value 'MY_APP_SECRET'
+aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/app-id" --type String --value 'MY_APP_ID'
+aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/app-key" --type String --value 'MY_APP_KEY'
+aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/app-secret" --type String --value 'MY_APP_SECRET'
 
 # You cannot set empty values so just leave not create the parameters if you don't want webhooks
 # Leave empty if you don't need webhooks
-aws ssm put-parameter --region $REGION --name '/serverless-websockets/webhook-target' --type String --value ''
+aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/webhook-target" --type String --value ''
 # Add the events you want to receive: channel_occupied,channel_vacated,member_added,member_removed,client_event
-aws ssm put-parameter --region $REGION --name '/serverless-websockets/webhook-events' --type String --value ''
+aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/webhook-events" --type String --value ''
 
 # Set to true if you want to allow clients to send event in authenticated channels
-aws ssm put-parameter --region $REGION --name '/serverless-websockets/client-events-enabled' --type String --value 'false'
+aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/client-events-enabled" --type String --value 'false'
 
 # There is a little example application on /wave you can use to see if everything is working as expected
-aws ssm put-parameter --region $REGION --name '/serverless-websockets/wave-example-enabled' --type String --value 'false'
+aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/wave-example-enabled" --type String --value 'false'
 ```
 
 Do not forget to re-deploy after updating the parameters.
