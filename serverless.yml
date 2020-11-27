@@ -14,6 +14,8 @@ provider:
     APP_API_ID: !Ref "HttpApi"
     APP_SQS_URL: !Ref "SQSWebhookQueue"
     APP_WS_API_ID: !Ref "WebsocketsApi"
+    APP_DB_CHANNELS_TABLE: !Ref "DynamoDBChannelsTable"
+    APP_DB_CONNECTION_POOL_TABLE: !Ref "DynamoDBConnectionPoolTable"
 
     # Configure the Pusher protocol app ID, key and secret
     APP_ID: ${ssm:/serverless-websockets/${self:provider.stage}/app-id}

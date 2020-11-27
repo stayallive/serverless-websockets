@@ -19,9 +19,6 @@ use Stayallive\ServerlessWebSockets\Connections\ConnectionManager as BaseConnect
 
 class ConnectionManager extends BaseConnectionManager
 {
-    public const CHANNELS_TABLE        = 'serverless-websockets-channels';
-    public const CONNECTION_POOL_TABLE = 'serverless-websockets-connection-pool';
-
     private DynamoDbClient $db;
 
     public function __construct(DynamoDbClient $db)
@@ -33,7 +30,7 @@ class ConnectionManager extends BaseConnectionManager
     public function connect(WebsocketEvent $event): void
     {
         $this->db->putItem(new PutItemInput([
-            'TableName' => self::CONNECTION_POOL_TABLE,
+            'TableName' => app_db_connection_pool_table(),
             'Item'      => [
                 'connection-id' => new AttributeValue(['S' => $event->getConnectionId()]),
                 'socket-id'     => new AttributeValue(['S' => $this->generateSocketId()]),
@@ -46,7 +43,7 @@ class ConnectionManager extends BaseConnectionManager
         $this->removeFromAllChannels($event->getConnectionId());
 
         $this->db->deleteItem(new DeleteItemInput([
-            'TableName' => self::CONNECTION_POOL_TABLE,
+            'TableName' => app_db_connection_pool_table(),
             'Key'       => [
                 'connection-id' => new AttributeValue(['S' => $event->getConnectionId()]),
             ],
@@ -57,7 +54,7 @@ class ConnectionManager extends BaseConnectionManager
     public function findSocketIdForConnectionId(string $connectionId): ?string
     {
         $request = $this->db->getItem(new GetItemInput([
-            'TableName'      => self::CONNECTION_POOL_TABLE,
+            'TableName'      => app_db_connection_pool_table(),
             'Key'            => [
                 'connection-id' => new AttributeValue(['S' => $connectionId]),
             ],
@@ -83,7 +80,7 @@ class ConnectionManager extends BaseConnectionManager
     public function channels(): array
     {
         $request = $this->db->scan(new ScanInput([
-            'TableName'      => self::CHANNELS_TABLE,
+            'TableName'      => app_db_channels_table(),
             'ConsistentRead' => true,
         ]));
 
@@ -108,7 +105,7 @@ class ConnectionManager extends BaseConnectionManager
     public function findChannel(string $channelName): ?AbstractChannel
     {
         $request = $this->db->getItem(new GetItemInput([
-            'TableName'      => self::CHANNELS_TABLE,
+            'TableName'      => app_db_channels_table(),
             'Key'            => [
                 'channel-id' => new AttributeValue(['S' => $channelName]),
             ],
@@ -154,7 +151,7 @@ class ConnectionManager extends BaseConnectionManager
     protected function removeFromAllChannels(string $connectionId): void
     {
         $request = $this->db->getItem(new GetItemInput([
-            'TableName'      => self::CONNECTION_POOL_TABLE,
+            'TableName'      => app_db_connection_pool_table(),
             'Key'            => [
                 'connection-id' => new AttributeValue(['S' => $connectionId]),
             ],

@@ -10,7 +10,6 @@ use AsyncAws\DynamoDb\ValueObject\AttributeValue;
 use Stayallive\ServerlessWebSockets\Messages\Message;
 use Stayallive\ServerlessWebSockets\Messages\BuildsPusherMessages;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Stayallive\ServerlessWebSockets\Connections\DynamoDB\ConnectionManager;
 use Stayallive\ServerlessWebSockets\Connections\Channels\AbstractChannel as BaseChannel;
 
 abstract class AbstractChannel extends BaseChannel
@@ -145,7 +144,7 @@ abstract class AbstractChannel extends BaseChannel
         }
 
         $this->db->updateItem(new UpdateItemInput([
-            'TableName'                 => ConnectionManager::CONNECTION_POOL_TABLE,
+            'TableName'                 => app_db_connection_pool_table(),
             'Key'                       => [
                 'connection-id' => new AttributeValue(['S' => $connectionId]),
             ],
@@ -167,7 +166,7 @@ abstract class AbstractChannel extends BaseChannel
         }
 
         $this->db->updateItem(new UpdateItemInput([
-            'TableName'                 => ConnectionManager::CONNECTION_POOL_TABLE,
+            'TableName'                 => app_db_connection_pool_table(),
             'Key'                       => [
                 'connection-id' => new AttributeValue(['S' => $connectionId]),
             ],
@@ -210,7 +209,7 @@ abstract class AbstractChannel extends BaseChannel
         }
 
         $request = $this->db->deleteItem(new DeleteItemInput([
-            'TableName'                 => ConnectionManager::CHANNELS_TABLE,
+            'TableName'                 => app_db_channels_table(),
             'Key'                       => [
                 'channel-id' => new AttributeValue(['S' => $this->name]),
             ],
@@ -242,7 +241,7 @@ abstract class AbstractChannel extends BaseChannel
         }
 
         $result = $this->db->updateItem(new UpdateItemInput([
-            'TableName'                 => ConnectionManager::CHANNELS_TABLE,
+            'TableName'                 => app_db_channels_table(),
             'Key'                       => [
                 'channel-id' => new AttributeValue(['S' => $this->name]),
             ],
@@ -267,7 +266,7 @@ abstract class AbstractChannel extends BaseChannel
     protected function addConnectionForConnectionId(string $connectionId, string $socketId, array $payload): void
     {
         $result = $this->db->updateItem(new UpdateItemInput([
-            'TableName'                 => ConnectionManager::CHANNELS_TABLE,
+            'TableName'                 => app_db_channels_table(),
             'Key'                       => [
                 'channel-id' => new AttributeValue(['S' => $this->name]),
             ],
@@ -292,7 +291,7 @@ abstract class AbstractChannel extends BaseChannel
     protected function removeConnectionForConnectionId(string $connectionId): void
     {
         $result = $this->db->updateItem(new UpdateItemInput([
-            'TableName'                => ConnectionManager::CHANNELS_TABLE,
+            'TableName'                => app_db_channels_table(),
             'Key'                      => [
                 'channel-id' => new AttributeValue(['S' => $this->name]),
             ],

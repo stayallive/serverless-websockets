@@ -61,6 +61,15 @@ function app_ws_api_endpoint(): string
     return sprintf('%s.execute-api.%s.amazonaws.com', app_ws_api_id(), app_region());
 }
 
+function app_db_channels_table(): string
+{
+    return get_required_env_var('APP_DB_CHANNELS_TABLE');
+}
+
+function app_db_connection_pool_table(): string
+{
+    return get_required_env_var('APP_DB_CONNECTION_POOL_TABLE');
+}
 
 function wave_example_enabled(): bool
 {

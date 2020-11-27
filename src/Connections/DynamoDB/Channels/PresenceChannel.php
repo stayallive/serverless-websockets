@@ -5,7 +5,6 @@ namespace Stayallive\ServerlessWebSockets\Connections\DynamoDB\Channels;
 use AsyncAws\DynamoDb\Input\UpdateItemInput;
 use AsyncAws\DynamoDb\ValueObject\AttributeValue;
 use Stayallive\ServerlessWebSockets\Messages\Message;
-use Stayallive\ServerlessWebSockets\Connections\DynamoDB\ConnectionManager;
 use Stayallive\ServerlessWebSockets\Connections\Channels\PresenceChannel as PresenceChannelInterface;
 
 class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
@@ -59,7 +58,7 @@ class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
         $alreadyConnected = $this->userHasOpenConnections($userId, $connectionId);
 
         $result = $this->db->updateItem(new UpdateItemInput([
-            'TableName'                 => ConnectionManager::CHANNELS_TABLE,
+            'TableName'                 => app_db_channels_table(),
             'Key'                       => [
                 'channel-id' => new AttributeValue(['S' => $this->name]),
             ],
@@ -109,7 +108,7 @@ class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
             queue_webhook('member_removed', ['channel' => $this->name, 'user_id' => $userId]);
 
             $result = $this->db->updateItem(new UpdateItemInput([
-                'TableName'                => ConnectionManager::CHANNELS_TABLE,
+                'TableName'                => app_db_channels_table(),
                 'Key'                      => [
                     'channel-id' => new AttributeValue(['S' => $this->name]),
                 ],
