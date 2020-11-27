@@ -50,6 +50,7 @@ provider:
         - sqs:SendMessage
       Resource:
         - !GetAtt "SQSWebhookQueue.Arn"
+  logRetentionInDays: 90
 
 functions:
   api:
