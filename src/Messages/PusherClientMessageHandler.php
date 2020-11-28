@@ -9,7 +9,7 @@ use Stayallive\ServerlessWebSockets\Connections\Channels\PresenceChannel;
 
 class PusherClientMessageHandler implements MessageHandler
 {
-    use BuildsPusherMessages;
+    use SendsPusherMessages;
 
     private WebsocketEvent $event;
 
@@ -24,24 +24,43 @@ class PusherClientMessageHandler implements MessageHandler
         $this->channelManager = $channelManager;
     }
 
-    public function respond(): Message
+    public function handle(): void
     {
         if (!client_events_enabled()) {
-            return $this->buildPusherErrorMessage('Client events are not allowed');
+            $this->respondToEvent(
+                $this->event,
+                $this->buildPusherErrorMessage('Client events are not allowed')
+            );
+
+            return;
         }
 
         if (!Str::startsWith($this->payload['event'], 'client-')) {
-            return $this->buildPusherErrorMessage('Client events must be prefixed by `client-`');
+            $this->respondToEvent(
+                $this->event,
+                $this->buildPusherErrorMessage('Client events must be prefixed by `client-`')
+            );
+
+            return;
         }
 
         if (!$this->channelManager->isAuthenticatedChannel($this->payload['channel'])) {
-            return $this->buildPusherErrorMessage('Client event are only allowed on authenticated channels', 4009);
+            $this->respondToEvent(
+                $this->event,
+                $this->buildPusherErrorMessage('Client event are only allowed on authenticated channels', 4009)
+            );
+
+            return;
         }
 
         $channel = $this->channelManager->findChannel($this->payload['channel']);
 
         if ($channel !== null) {
-            $channel->broadcastToEveryoneExcept($this->payload['event'], $this->payload['data'] ?? null, $this->event->getConnectionId());
+            $channel->broadcastToEveryoneExcept(
+                $this->payload['event'],
+                $this->payload['data'] ?? null,
+                $this->event->getConnectionId()
+            );
 
             if (webhook_event_enabled('client_event')) {
                 queue_webhook('client_event', [
@@ -53,8 +72,5 @@ class PusherClientMessageHandler implements MessageHandler
                 ]);
             }
         }
-
-        // Because of API Gateway limitations we are required to respond with something, so we do with a simple message
-        return $this->buildPusherAcknowledgeMessage();
     }
 }

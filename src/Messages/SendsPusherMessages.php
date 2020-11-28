@@ -2,8 +2,10 @@
 
 namespace Stayallive\ServerlessWebSockets\Messages;
 
-trait BuildsPusherMessages
+trait SendsPusherMessages
 {
+    use SendsMessages;
+
     private function buildPusherMessage(string $event, ?array $data = null, ?string $channel = null): PusherMessage
     {
         $message = new PusherMessage($event);
@@ -40,15 +42,5 @@ trait BuildsPusherMessages
     protected function buildPusherChannelMessage(string $channel, string $event, ?array $data = null): PusherMessage
     {
         return $this->buildPusherMessage($event, $data, $channel);
-    }
-
-    /**
-     * This is a "custom" message Pusher clients will ignore.
-     *
-     * Used when there is no meaningful response, but API Gateway requires one so we give this.
-     */
-    protected function buildPusherAcknowledgeMessage(): PusherMessage
-    {
-        return $this->buildPusherMessage('internal:ack');
     }
 }

@@ -4,19 +4,10 @@ namespace Stayallive\ServerlessWebSockets\Connections\DynamoDB\Channels;
 
 use AsyncAws\DynamoDb\Input\UpdateItemInput;
 use AsyncAws\DynamoDb\ValueObject\AttributeValue;
-use Stayallive\ServerlessWebSockets\Messages\Message;
 use Stayallive\ServerlessWebSockets\Connections\Channels\PresenceChannel as PresenceChannelInterface;
 
 class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
 {
-    public function subscribe(string $connectionId, string $socketId, array $payload): Message
-    {
-        parent::subscribe($connectionId, $socketId, $payload);
-
-        return $this->buildPusherChannelMessage($this->name, 'pusher_internal:subscription_succeeded', $this->getChannelData());
-    }
-
-
     public function userIds(): array
     {
         if (!$this->exists()) {
@@ -128,6 +119,18 @@ class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
         }
 
         parent::removeConnectionForConnectionId($connectionId);
+    }
+
+    protected function responseWithSubscriptionSucceeded(string $connectionId): void
+    {
+        $this->sendMessageToConnection(
+            $connectionId,
+            $this->buildPusherChannelMessage(
+                $this->name,
+                'pusher_internal:subscription_succeeded',
+                $this->getChannelData()
+            )
+        );
     }
 
 

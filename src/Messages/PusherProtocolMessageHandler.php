@@ -8,7 +8,7 @@ use Stayallive\ServerlessWebSockets\Connections\ConnectionManager;
 
 class PusherProtocolMessageHandler implements MessageHandler
 {
-    use BuildsPusherMessages;
+    use SendsPusherMessages;
 
     private WebsocketEvent $event;
 
@@ -26,45 +26,50 @@ class PusherProtocolMessageHandler implements MessageHandler
     /**
      * @uses ping, connect, subscribe, unsubscribe
      */
-    public function respond(): Message
+    public function handle(): void
     {
         $eventName = Str::camel(Str::after($this->payload['event'], ':'));
 
         if (method_exists($this, $eventName)) {
-            return $this->{$eventName}();
+            $this->{$eventName}();
+
+            return;
         }
 
-        return $this->buildPusherErrorMessage('Pusher protocol message handler not implemented.');
+        $this->respondToEvent(
+            $this->event,
+            $this->buildPusherErrorMessage('Pusher protocol message handler not implemented.')
+        );
     }
 
     /**
      * @see https://pusher.com/docs/channels/library_auth_reference/pusher-websockets-protocol#ping-and-pong-messages
      */
-    private function ping(): Message
+    private function ping(): void
     {
-        return $this->buildPusherEventMessage('pusher:pong');
+        $this->respondToEvent(
+            $this->event,
+            $this->buildPusherEventMessage('pusher:pong')
+        );
     }
 
     /**
      * @see https://pusher.com/docs/channels/library_auth_reference/pusher-websockets-protocol#-pusher-subscribe-client-pusher-channels-
      */
-    protected function subscribe(): Message
+    protected function subscribe(): void
     {
         $socketId = $this->channelManager->findSocketIdForConnectionId($this->event->getConnectionId());
 
-        return $this->channelManager->findOrNewChannel($this->payload['data']['channel'])
-                                    ->subscribe($this->event->getConnectionId(), $socketId, $this->payload['data'] ?? []);
+        $this->channelManager->findOrNewChannel($this->payload['data']['channel'])
+                             ->subscribe($this->event->getConnectionId(), $socketId, $this->payload['data'] ?? []);
     }
 
     /**
      * @see https://pusher.com/docs/channels/library_auth_reference/pusher-websockets-protocol#-pusher-unsubscribe-client-pusher-channels-
      */
-    protected function unsubscribe(): Message
+    protected function unsubscribe(): void
     {
         $this->channelManager->findOrNewChannel($this->payload['data']['channel'])
                              ->unsubscribe($this->event->getConnectionId());
-
-        // Because of API Gateway limitations we are required to respond with something, so we do with a simple message
-        return $this->buildPusherAcknowledgeMessage();
     }
 }

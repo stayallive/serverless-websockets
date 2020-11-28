@@ -1,7 +1,5 @@
 <?php
 
-use Slim\App;
-use AsyncAws\DynamoDb\DynamoDbClient;
 use Psr\Container\ContainerInterface;
 use Slim\Routing\RouteCollectorProxy;
 use Slim\Exception\HttpNotFoundException;
@@ -9,24 +7,18 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Stayallive\ServerlessWebSockets\Http\Middleware;
 use Stayallive\ServerlessWebSockets\Http\Controllers;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Stayallive\ServerlessWebSockets\Connections\ConnectionManager;
-use Stayallive\ServerlessWebSockets\Connections\DynamoDB\ConnectionManager as DynamoDBConnectionManager;
-
-const VIEW_PATH = __DIR__ . '/../resources/views';
-
-require __DIR__ . '/../vendor/autoload.php';
-
-$app = DI\Bridge\Slim\Bridge::create();
 
 /** @var \DI\Container $container */
-$container = $app->getContainer();
+$container = require __DIR__ . '/../bootstrap/container.php';
 
-$container->set(ResponseFactoryInterface::class, function (ContainerInterface $container) {
-    return $container->get(App::class)->getResponseFactory();
-});
-$container->set(ConnectionManager::class, function () {
-    return new DynamoDBConnectionManager(new DynamoDbClient);
-});
+$app = DI\Bridge\Slim\Bridge::create($container);
+
+$container->set(
+    ResponseFactoryInterface::class,
+    static function (ContainerInterface $container): ResponseFactoryInterface {
+        return $container->get(Slim\App::class)->getResponseFactory();
+    }
+);
 
 $app->addRoutingMiddleware();
 
@@ -50,13 +42,6 @@ $errorHandler->setErrorHandler(
     }
 );
 
-if (wave_example_enabled()) {
-    $app->group('/wave', function (RouteCollectorProxy $group) {
-        $group->get('', Controllers\Wave\View::class);
-        $group->post('/pusher/auth', Controllers\Wave\SocketAuth::class);
-    });
-}
-
 $app->group('/apps/{appId}', function (RouteCollectorProxy $group) {
     $group->post('/events', Controllers\API\Pusher\TriggerEvent::class);
     $group->post('/batch_events', Controllers\API\Pusher\TriggerEvents::class);
@@ -67,5 +52,12 @@ $app->group('/apps/{appId}', function (RouteCollectorProxy $group) {
 })
     ->add($container->get(Middleware\EnsureValidAppKey::class))
     ->add($container->get(Middleware\EnsureValidSignature::class));
+
+if (wave_example_enabled()) {
+    $app->group('/wave', function (RouteCollectorProxy $group) {
+        $group->get('', Controllers\Wave\View::class);
+        $group->post('/pusher/auth', Controllers\Wave\SocketAuth::class);
+    });
+}
 
 $app->run();

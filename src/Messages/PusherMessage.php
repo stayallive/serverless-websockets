@@ -2,8 +2,6 @@
 
 namespace Stayallive\ServerlessWebSockets\Messages;
 
-use Bref\Event\Http\HttpResponse;
-
 class PusherMessage implements Message
 {
     private string  $event;
@@ -29,7 +27,7 @@ class PusherMessage implements Message
         return $this;
     }
 
-    public function toGatewayResponse(): HttpResponse
+    public function toMessageBody(): string
     {
         $message = [
             'event' => $this->event,
@@ -43,6 +41,6 @@ class PusherMessage implements Message
             $message['channel'] = $this->channel;
         }
 
-        return new HttpResponse(json_encode($message));
+        return json_encode($message);
     }
 }

@@ -1,13 +1,10 @@
 <?php
 
-use AsyncAws\DynamoDb\DynamoDbClient;
 use Stayallive\ServerlessWebSockets\Handlers\PusherProtocolHandler;
-use Stayallive\ServerlessWebSockets\Connections\DynamoDB\ConnectionManager;
 
-require __DIR__ . '/../vendor/autoload.php';
+/** @var \DI\Container $container */
+$container = require __DIR__ . '/../bootstrap/container.php';
 
-return new PusherProtocolHandler(
-    new ConnectionManager(
-        new DynamoDbClient
-    )
+return $container->get(
+    PusherProtocolHandler::class
 );

@@ -2,6 +2,9 @@
 
 use Stayallive\ServerlessWebSockets\Handlers\WebhookHandler;
 
-require __DIR__ . '/../vendor/autoload.php';
+/** @var \DI\Container $container */
+$container = require __DIR__ . '/../bootstrap/container.php';
 
-return new WebhookHandler;
+return $container->get(
+    WebhookHandler::class
+);

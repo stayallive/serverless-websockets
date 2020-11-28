@@ -1,6 +1,7 @@
 <?php
 
 $finder = PhpCsFixer\Finder::create()
+    ->in(__DIR__ . '/bootstrap')
     ->in(__DIR__ . '/handlers')
     ->in(__DIR__ . '/src')
     ->name('*.php')

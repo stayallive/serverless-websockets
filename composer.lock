@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6f60b4a6a3f69fa01faa7da5fba36f71",
+    "content-hash": "b030597512f5ceeb2461e4f209574dc0",
     "packages": [
         {
             "name": "async-aws/core",
@@ -75,16 +75,16 @@
         },
         {
             "name": "async-aws/dynamo-db",
-            "version": "dev-master",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/async-aws/dynamo-db.git",
-                "reference": "a4808ec37d9da540f096465717324c8b2d393bdb"
+                "reference": "92bdc56808e315f20d424ee061dc3e3edab14898"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/async-aws/dynamo-db/zipball/a4808ec37d9da540f096465717324c8b2d393bdb",
-                "reference": "a4808ec37d9da540f096465717324c8b2d393bdb",
+                "url": "https://api.github.com/repos/async-aws/dynamo-db/zipball/92bdc56808e315f20d424ee061dc3e3edab14898",
+                "reference": "92bdc56808e315f20d424ee061dc3e3edab14898",
                 "shasum": ""
             },
             "require": {
@@ -93,7 +93,6 @@
                 "ext-json": "*",
                 "php": "^7.2.5 || ^8.0"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -810,16 +809,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.41.5",
+            "version": "2.42.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "c4a9caf97cfc53adfc219043bcecf42bc663acee"
+                "reference": "d0463779663437392fe42ff339ebc0213bd55498"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/c4a9caf97cfc53adfc219043bcecf42bc663acee",
-                "reference": "c4a9caf97cfc53adfc219043bcecf42bc663acee",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/d0463779663437392fe42ff339ebc0213bd55498",
+                "reference": "d0463779663437392fe42ff339ebc0213bd55498",
                 "shasum": ""
             },
             "require": {
@@ -834,7 +833,7 @@
                 "kylekatarnls/multi-tester": "^2.0",
                 "phpmd/phpmd": "^2.9",
                 "phpstan/extension-installer": "^1.0",
-                "phpstan/phpstan": "^0.12.35",
+                "phpstan/phpstan": "^0.12.54",
                 "phpunit/phpunit": "^7.5 || ^8.0",
                 "squizlabs/php_codesniffer": "^3.4"
             },
@@ -899,7 +898,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-10-23T06:02:30+00:00"
+            "time": "2020-11-28T14:25:28+00:00"
         },
         {
             "name": "nikic/fast-route",
@@ -4694,7 +4693,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "async-aws/dynamo-db": 20,
         "symfony/http-client": 5
     },
     "prefer-stable": false,

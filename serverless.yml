@@ -68,9 +68,7 @@ functions:
     events:
       - websocket: $connect
       - websocket: $disconnect
-      - websocket:
-          route: $default
-          routeResponseSelectionExpression: $default
+      - websocket: $default
     description: 'Serverless Websockets WS'
   webhook:
     handler: handlers/webhook.php

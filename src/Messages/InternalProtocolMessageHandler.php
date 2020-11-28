@@ -8,7 +8,7 @@ use Stayallive\ServerlessWebSockets\Connections\ConnectionManager;
 
 class InternalProtocolMessageHandler implements MessageHandler
 {
-    use BuildsPusherMessages;
+    use SendsPusherMessages;
 
     private WebsocketEvent $event;
 
@@ -24,19 +24,22 @@ class InternalProtocolMessageHandler implements MessageHandler
     }
 
     /**
-     * @return \Stayallive\ServerlessWebSockets\Messages\Message
-     *
      * @uses connect
      */
-    public function respond(): Message
+    public function handle(): void
     {
         $eventName = Str::camel(Str::after($this->payload['event'], ':'));
 
         if (method_exists($this, $eventName)) {
-            return $this->{$eventName}();
+            $this->{$eventName}();
+
+            return;
         }
 
-        return $this->buildPusherErrorMessage('Internal protocol message handler not implemented.');
+        $this->respondToEvent(
+            $this->event,
+            $this->buildPusherErrorMessage('Internal protocol message handler not implemented.')
+        );
     }
 
     /**
@@ -44,17 +47,25 @@ class InternalProtocolMessageHandler implements MessageHandler
      *
      * You cannot respond to the connect event so we need the client to "request" a connect.
      */
-    private function connect(): Message
+    private function connect(): void
     {
         $socketId = $this->connectionManager->findSocketIdForConnectionId($this->event->getConnectionId());
 
         if ($socketId === null) {
-            return $this->buildPusherErrorMessage('Socket not registered.', 4200);
+            $this->respondToEvent(
+                $this->event,
+                $this->buildPusherErrorMessage('Socket not registered.', 4200)
+            );
+
+            return;
         }
 
-        return $this->buildPusherEventMessage('pusher:connection_established', [
-            'socket_id'        => $socketId,
-            'activity_timeout' => 30,
-        ]);
+        $this->respondToEvent(
+            $this->event,
+            $this->buildPusherEventMessage('pusher:connection_established', [
+                'socket_id'        => $socketId,
+                'activity_timeout' => 30,
+            ])
+        );
     }
 }

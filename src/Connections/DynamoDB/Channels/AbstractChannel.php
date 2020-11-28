@@ -7,14 +7,14 @@ use AsyncAws\DynamoDb\Input\DeleteItemInput;
 use AsyncAws\DynamoDb\Input\UpdateItemInput;
 use AsyncAws\Core\Exception\Http\HttpException;
 use AsyncAws\DynamoDb\ValueObject\AttributeValue;
-use Stayallive\ServerlessWebSockets\Messages\Message;
-use Stayallive\ServerlessWebSockets\Messages\BuildsPusherMessages;
+use Stayallive\ServerlessWebSockets\Messages\PusherMessage;
+use Stayallive\ServerlessWebSockets\Messages\SendsPusherMessages;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Stayallive\ServerlessWebSockets\Connections\Channels\AbstractChannel as BaseChannel;
 
 abstract class AbstractChannel extends BaseChannel
 {
-    use BuildsPusherMessages;
+    use SendsPusherMessages;
 
     protected DynamoDbClient $db;
 
@@ -32,11 +32,9 @@ abstract class AbstractChannel extends BaseChannel
     }
 
 
-    public function subscribe(string $connectionId, string $socketId, array $payload): Message
+    public function subscribe(string $connectionId, string $socketId, array $payload): void
     {
-        if (!$this->hasConnections()) {
-            queue_webhook('channel_occupied', ['channel' => $this->name]);
-        }
+        $hadConnectionBeforeSubscription = $this->hasConnections();
 
         $this->createEmptyChannelIfNeeded();
 
@@ -44,7 +42,11 @@ abstract class AbstractChannel extends BaseChannel
 
         $this->addConnectionForConnectionId($connectionId, $socketId, $payload);
 
-        return $this->buildPusherChannelMessage($this->name, 'pusher_internal:subscription_succeeded');
+        $this->responseWithSubscriptionSucceeded($connectionId);
+
+        if (!$hadConnectionBeforeSubscription) {
+            queue_webhook('channel_occupied', ['channel' => $this->name]);
+        }
     }
 
     public function unsubscribe(string $connectionId): void
@@ -94,20 +96,17 @@ abstract class AbstractChannel extends BaseChannel
 
     public function broadcastToEveryoneExcept(string $event, $data = null, ?string $exceptConnectionId = null): void
     {
-        $message = [
-            'event'   => $event,
-            'channel' => $this->name,
-        ];
+        $message = new PusherMessage($event);
+
+        $message->toChannel($this->name);
 
         if ($data !== null) {
             if (is_array($data)) {
                 $data = json_encode($data);
             }
 
-            $message['data'] = $data;
+            $message->withData($data);
         }
-
-        $message = json_encode($message);
 
         foreach ($this->connectionIds() as $connectionId) {
             if ($exceptConnectionId !== null && $exceptConnectionId === $connectionId) {
@@ -115,7 +114,7 @@ abstract class AbstractChannel extends BaseChannel
             }
 
             try {
-                socket_client()->message($connectionId, $message);
+                $this->sendMessageToConnection($connectionId, $message);
             } catch (ClientExceptionInterface $e) {
                 // Handle disconnected clients that were not cleaned up correctly
                 if ($e->getResponse()->getStatusCode() === 410) {
@@ -304,5 +303,13 @@ abstract class AbstractChannel extends BaseChannel
         ]));
 
         $this->data = array_merge($this->data, $result->getAttributes());
+    }
+
+    protected function responseWithSubscriptionSucceeded(string $connectionId): void
+    {
+        $this->sendMessageToConnection(
+            $connectionId,
+            $this->buildPusherChannelMessage($this->name, 'pusher_internal:subscription_succeeded')
+        );
     }
 }
