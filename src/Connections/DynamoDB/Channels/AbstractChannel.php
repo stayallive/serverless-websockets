@@ -155,7 +155,7 @@ abstract class AbstractChannel extends BaseChannel
             'ExpressionAttributeValues' => [
                 ':channel' => new AttributeValue(['SS' => [$this->name]]),
             ],
-        ]))->resolve();
+        ]));
     }
 
     public function unsubscribeOnConnectionPool(string $connectionId): void
@@ -177,7 +177,7 @@ abstract class AbstractChannel extends BaseChannel
             'ExpressionAttributeValues' => [
                 ':channel' => new AttributeValue(['SS' => [$this->name]]),
             ],
-        ]))->resolve();
+        ]));
     }
 
 
