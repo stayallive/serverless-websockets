@@ -138,3 +138,5 @@ package:
   exclude:
     - 'node_modules/**'
     - 'tests/**'
+
+configValidationMode: error
