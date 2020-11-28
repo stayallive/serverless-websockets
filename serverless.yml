@@ -79,6 +79,7 @@ functions:
     events:
       - sqs:
           arn: !GetAtt "SQSWebhookQueue.Arn"
+          enabled: ${strToBool(${ssm:/serverless-websockets/${self:provider.stage}/webhook-enabled, 'false'})}
           batchSize: 1
     description: 'Serverless Websockets Webhook'
   disconnect-all-clients:

@@ -30,6 +30,8 @@ aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/app
 
 ### The parameters below are optional:
 
+# Set this to true to enable the webhook worker which sends the webhooks, set to false to disable the worker
+aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/webhook-enabled" --type String --value 'false'
 # You cannot set empty values so just not create the parameters if you don't want webhooks
 aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/webhook-target" --type String --value ''
 # Add the events you want to receive: channel_occupied,channel_vacated,member_added,member_removed,client_event
