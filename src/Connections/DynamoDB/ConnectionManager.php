@@ -33,6 +33,7 @@ class ConnectionManager extends BaseConnectionManager
             'TableName' => app_db_connection_pool_table(),
             'Item'      => [
                 'connection-id' => new AttributeValue(['S' => $event->getConnectionId()]),
+                'connect-time'  => new AttributeValue(['N' => (string)time()]),
                 'socket-id'     => new AttributeValue(['S' => $this->generateSocketId()]),
             ],
         ]));
