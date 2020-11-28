@@ -30,7 +30,7 @@ class ConnectionManager extends BaseConnectionManager
     public function connect(WebsocketEvent $event): void
     {
         $this->db->putItem(new PutItemInput([
-            'TableName' => app_db_connection_pool_table(),
+            'TableName' => app_db_connections_table(),
             'Item'      => [
                 'connection-id' => new AttributeValue(['S' => $event->getConnectionId()]),
                 'connect-time'  => new AttributeValue(['N' => (string)time()]),
@@ -44,7 +44,7 @@ class ConnectionManager extends BaseConnectionManager
         $this->removeFromAllChannels($event->getConnectionId());
 
         $this->db->deleteItem(new DeleteItemInput([
-            'TableName' => app_db_connection_pool_table(),
+            'TableName' => app_db_connections_table(),
             'Key'       => [
                 'connection-id' => new AttributeValue(['S' => $event->getConnectionId()]),
             ],
@@ -55,7 +55,7 @@ class ConnectionManager extends BaseConnectionManager
     public function findSocketIdForConnectionId(string $connectionId): ?string
     {
         $request = $this->db->getItem(new GetItemInput([
-            'TableName'      => app_db_connection_pool_table(),
+            'TableName'      => app_db_connections_table(),
             'Key'            => [
                 'connection-id' => new AttributeValue(['S' => $connectionId]),
             ],
@@ -152,7 +152,7 @@ class ConnectionManager extends BaseConnectionManager
     protected function removeFromAllChannels(string $connectionId): void
     {
         $request = $this->db->getItem(new GetItemInput([
-            'TableName'      => app_db_connection_pool_table(),
+            'TableName'      => app_db_connections_table(),
             'Key'            => [
                 'connection-id' => new AttributeValue(['S' => $connectionId]),
             ],

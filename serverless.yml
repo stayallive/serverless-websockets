@@ -15,7 +15,7 @@ provider:
     APP_SQS_URL: !Ref "SQSWebhookQueue"
     APP_WS_API_ID: !Ref "WebsocketsApi"
     APP_DB_CHANNELS_TABLE: !Ref "DynamoDBChannelsTable"
-    APP_DB_CONNECTION_POOL_TABLE: !Ref "DynamoDBConnectionPoolTable"
+    APP_DB_CONNECTIONS_TABLE: !Ref "DynamoDBConnectionsTable"
 
     # Configure the Pusher protocol app ID, key and secret
     APP_ID: ${ssm:/serverless-websockets/${self:provider.stage}/app-id}
@@ -44,7 +44,7 @@ provider:
         - dynamodb:DeleteItem
       Resource:
         - !GetAtt "DynamoDBChannelsTable.Arn"
-        - !GetAtt "DynamoDBConnectionPoolTable.Arn"
+        - !GetAtt "DynamoDBConnectionsTable.Arn"
     - Effect: Allow
       Action:
         - sqs:SendMessage
@@ -85,10 +85,10 @@ functions:
 resources:
   Resources:
     # This table is used to have a reference to all connected clients and their assigned socket ID's
-    DynamoDBConnectionPoolTable:
+    DynamoDBConnectionsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: serverless-websockets-connection-pool-${self:provider.stage}
+        TableName: serverless-websockets-connections-${self:provider.stage}
         BillingMode: 'PAY_PER_REQUEST'
         AttributeDefinitions:
           - AttributeName: connection-id

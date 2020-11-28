@@ -66,10 +66,11 @@ function app_db_channels_table(): string
     return get_required_env_var('APP_DB_CHANNELS_TABLE');
 }
 
-function app_db_connection_pool_table(): string
+function app_db_connections_table(): string
 {
-    return get_required_env_var('APP_DB_CONNECTION_POOL_TABLE');
+    return get_required_env_var('APP_DB_CONNECTIONS_TABLE');
 }
+
 
 function wave_example_enabled(): bool
 {

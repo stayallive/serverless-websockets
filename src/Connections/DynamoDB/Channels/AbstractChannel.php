@@ -143,7 +143,7 @@ abstract class AbstractChannel extends BaseChannel
         }
 
         $this->db->updateItem(new UpdateItemInput([
-            'TableName'                 => app_db_connection_pool_table(),
+            'TableName'                 => app_db_connections_table(),
             'Key'                       => [
                 'connection-id' => new AttributeValue(['S' => $connectionId]),
             ],
@@ -165,7 +165,7 @@ abstract class AbstractChannel extends BaseChannel
         }
 
         $this->db->updateItem(new UpdateItemInput([
-            'TableName'                 => app_db_connection_pool_table(),
+            'TableName'                 => app_db_connections_table(),
             'Key'                       => [
                 'connection-id' => new AttributeValue(['S' => $connectionId]),
             ],
