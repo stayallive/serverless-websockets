@@ -42,7 +42,7 @@ abstract class AbstractChannel extends BaseChannel
 
         $this->addConnectionForConnectionId($connectionId, $socketId, $payload);
 
-        $this->responseWithSubscriptionSucceeded($connectionId);
+        $this->respondWithSubscriptionSucceeded($connectionId);
 
         if (!$hadConnectionBeforeSubscription) {
             queue_webhook('channel_occupied', ['channel' => $this->name]);
@@ -305,7 +305,7 @@ abstract class AbstractChannel extends BaseChannel
         $this->data = array_merge($this->data, $result->getAttributes());
     }
 
-    protected function responseWithSubscriptionSucceeded(string $connectionId): void
+    protected function respondWithSubscriptionSucceeded(string $connectionId): void
     {
         $this->sendMessageToConnection(
             $connectionId,

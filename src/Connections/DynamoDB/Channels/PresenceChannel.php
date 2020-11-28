@@ -121,7 +121,7 @@ class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
         parent::removeConnectionForConnectionId($connectionId);
     }
 
-    protected function responseWithSubscriptionSucceeded(string $connectionId): void
+    protected function respondWithSubscriptionSucceeded(string $connectionId): void
     {
         $this->sendMessageToConnection(
             $connectionId,
