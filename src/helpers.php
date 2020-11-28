@@ -122,6 +122,11 @@ function webhook_events_enabled(): bool
     return !empty(webhook_target());
 }
 
+function app_webhook_user_agent(): string
+{
+    return get_required_env_var('APP_WEBHOOK_USER_AGENT');
+}
+
 
 function sqs_client(): SqsClient
 {
@@ -156,7 +161,7 @@ function webhook_client(): HttpClientInterface
             'timeout'       => 15,
             'max_redirects' => 3,
             'headers'       => [
-                'User-Agent' => 'ServerlessWebsockets-WebhookSlinger',
+                'User-Agent' => app_webhook_user_agent(),
             ],
         ]),
         new GenericRetryStrategy(

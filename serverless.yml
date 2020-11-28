@@ -28,6 +28,8 @@ provider:
     # For more info see: https://pusher.com/docs/channels/server_api/webhooks
     # Set the value to a comma seperated string, for example: channel_occupied,channel_vacated,client_event
     APP_WEBHOOK_EVENTS: ${ssm:/serverless-websockets/${self:provider.stage}/webhook-events, ''}
+    # This value will show up in the User-Agent header for webhook requests
+    APP_WEBHOOK_USER_AGENT: WebhookSlinger-ServerlessWebsockets/${self:provider.stage}
 
     # Configure the server to allow client events on authenticated channels
     APP_CLIENT_EVENTS: ${ssm:/serverless-websockets/${self:provider.stage}/client-events-enabled, 'false'}
