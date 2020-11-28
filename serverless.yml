@@ -70,8 +70,8 @@ functions:
       - websocket: $disconnect
       - websocket: $default
     description: 'Serverless Websockets WS'
-  webhook:
-    handler: handlers/webhook.php
+  webhook-worker:
+    handler: handlers/webhook-worker.php
     layers:
       - ${bref:layer.php-74}
     timeout: 300
@@ -81,6 +81,18 @@ functions:
           arn: !GetAtt "SQSWebhookQueue.Arn"
           batchSize: 1
     description: 'Serverless Websockets Webhook'
+  disconnect-all-clients:
+    handler: handlers/disconnect-all-clients.php
+    layers:
+      - ${bref:layer.php-74}
+    description: 'Serverless Websockets Disconnect all clients'
+  cleanup-stale-connections:
+    handler: handlers/cleanup-stale-connections.php
+    layers:
+      - ${bref:layer.php-74}
+    events:
+      - schedule: rate(4 hours)
+    description: 'Serverless Websockets Cleanup stale connections'
 
 resources:
   Resources:

@@ -10,8 +10,15 @@ abstract class ConnectionManager
 {
     abstract public function connect(WebsocketEvent $event): void;
 
-    abstract public function disconnect(WebsocketEvent $event): void;
+    public function disconnect(WebsocketEvent $event): void
+    {
+        $this->disconnectConnectionId($event->getConnectionId());
+    }
 
+    abstract public function disconnectConnectionId(string $connectionId): void;
+
+
+    abstract public function findStaleConnectionIds(int $timeout = 86400): array;
 
     abstract public function findSocketIdForConnectionId(string $connectionId): ?string;
 

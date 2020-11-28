@@ -39,18 +39,42 @@ class ConnectionManager extends BaseConnectionManager
         ]));
     }
 
-    public function disconnect(WebsocketEvent $event): void
+    public function disconnectConnectionId(string $connectionId): void
     {
-        $this->removeFromAllChannels($event->getConnectionId());
+        $this->removeFromAllChannels($connectionId);
 
         $this->db->deleteItem(new DeleteItemInput([
             'TableName' => app_db_connections_table(),
             'Key'       => [
-                'connection-id' => new AttributeValue(['S' => $event->getConnectionId()]),
+                'connection-id' => new AttributeValue(['S' => $connectionId]),
             ],
         ]));
     }
 
+
+    public function findStaleConnectionIds(int $timeout = 86400): array
+    {
+        $request = $this->db->scan(new ScanInput([
+            'TableName'                 => app_db_connections_table(),
+            'FilterExpression'          => '#time <= :timeout',
+            'ExpressionAttributeNames'  => [
+                '#time' => 'connect-time',
+            ],
+            'ExpressionAttributeValues' => [
+                ':timeout' => new AttributeValue(['N' => (string)(time() - $timeout)]),
+            ],
+        ]));
+
+        try {
+            $request->resolve();
+        } catch (HttpException $e) {
+            return [];
+        }
+
+        return array_map(static function (array $item): string {
+            return $item['connection-id']->getS();
+        }, iterator_to_array($request->getItems()));
+    }
 
     public function findSocketIdForConnectionId(string $connectionId): ?string
     {
