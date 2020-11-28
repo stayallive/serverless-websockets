@@ -47,30 +47,37 @@ class PusherClientMessageHandler implements MessageHandler
         if (!$this->channelManager->isAuthenticatedChannel($this->payload['channel'])) {
             $this->respondToEvent(
                 $this->event,
-                $this->buildPusherErrorMessage('Client event are only allowed on authenticated channels', 4009)
+                $this->buildPusherErrorMessage('Publishing client events is only allowed on authenticated channels', 4009)
             );
 
             return;
         }
 
-        $channel = $this->channelManager->findChannel($this->payload['channel']);
+        $channel = $this->channelManager->findOrNewChannel($this->payload['channel']);
 
-        if ($channel !== null) {
-            $channel->broadcastToEveryoneExcept(
-                $this->payload['event'],
-                $this->payload['data'] ?? null,
-                $this->event->getConnectionId()
+        if (!in_array($this->event->getConnectionId(), $channel->connectionIds())) {
+            $this->respondToEvent(
+                $this->event,
+                $this->buildPusherErrorMessage('You must be subscribed to the channel before publishing events', 4009)
             );
 
-            if (webhook_event_enabled('client_event')) {
-                queue_webhook('client_event', [
-                    'channel'   => $this->payload['channel'],
-                    'event'     => $this->payload['event'],
-                    'data'      => $this->payload['data'] ?? null,
-                    'socket_id' => $this->channelManager->findSocketIdForConnectionId($this->event->getConnectionId()),
-                    'user_id'   => $channel instanceof PresenceChannel ? $channel->findUserIdForConnectionId($this->event->getConnectionId()) : null,
-                ]);
-            }
+            return;
+        }
+
+        $channel->broadcastToEveryoneExcept(
+            $this->payload['event'],
+            $this->payload['data'] ?? null,
+            $this->event->getConnectionId()
+        );
+
+        if (webhook_event_enabled('client_event')) {
+            queue_webhook('client_event', [
+                'channel'   => $this->payload['channel'],
+                'event'     => $this->payload['event'],
+                'data'      => $this->payload['data'] ?? null,
+                'socket_id' => $this->channelManager->findSocketIdForConnectionId($this->event->getConnectionId()),
+                'user_id'   => $channel instanceof PresenceChannel ? $channel->findUserIdForConnectionId($this->event->getConnectionId()) : null,
+            ]);
         }
     }
 }
