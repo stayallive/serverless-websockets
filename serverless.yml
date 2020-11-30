@@ -145,5 +145,6 @@ package:
   exclude:
     - 'node_modules/**'
     - 'tests/**'
+    - 'bin/**'
 
 configValidationMode: error
