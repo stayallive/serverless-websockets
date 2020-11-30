@@ -36,15 +36,11 @@ class TriggerEvent extends Controller
         }
 
         foreach ($event['channels'] as $channelName) {
-            $channel = $this->connections->findChannel($channelName);
-
-            if ($channel !== null) {
-                $channel->broadcastToEveryoneExcept(
-                    $event['name'],
-                    $event['data'] ?? null,
-                    $event['socket_id'] ?? null
-                );
-            }
+            $this->connections->channel($channelName)->broadcastToEveryoneExcept(
+                $event['name'],
+                $event['data'] ?? null,
+                $event['socket_id'] ?? null
+            );
         }
     }
 }

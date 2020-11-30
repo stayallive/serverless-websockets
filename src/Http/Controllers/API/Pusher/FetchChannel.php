@@ -17,7 +17,7 @@ class FetchChannel extends Controller
             $attributes = explode(',', trim($queryParams['info']));
         }
 
-        $channel = $this->connections->findOrNewChannel($channelName);
+        $channel = $this->connections->channel($channelName);
 
         $channelData = [
             'occupied' => $channel->hasConnections(),

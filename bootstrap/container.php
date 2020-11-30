@@ -13,7 +13,7 @@ $builder = new ContainerBuilder;
 
 $builder->addDefinitions([
     ConnectionManager::class => static function (DynamoDbClient $db): ConnectionManager {
-        return new Stayallive\ServerlessWebSockets\Connections\DynamoDB\ConnectionManager($db);
+        return new Stayallive\ServerlessWebSockets\DynamoDB\ConnectionManager($db);
     },
 ]);
 

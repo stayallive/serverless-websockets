@@ -13,9 +13,8 @@ provider:
     APP_REGION: ${opt:region, self:provider.region}
     APP_API_ID: !Ref "HttpApi"
     APP_SQS_URL: !Ref "SQSWebhookQueue"
+    APP_DB_TABLE: !Ref "DynamoDBTable"
     APP_WS_API_ID: !Ref "WebsocketsApi"
-    APP_DB_CHANNELS_TABLE: !Ref "DynamoDBChannelsTable"
-    APP_DB_CONNECTIONS_TABLE: !Ref "DynamoDBConnectionsTable"
 
     # Configure the Pusher protocol app ID, key and secret
     APP_ID: ${ssm:/serverless-websockets/${self:provider.stage}/app-id}
@@ -40,18 +39,19 @@ provider:
     - Effect: Allow
       Action:
         - dynamodb:Scan
+        - dynamodb:Query
         - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - !GetAtt "DynamoDBChannelsTable.Arn"
-        - !GetAtt "DynamoDBConnectionsTable.Arn"
+        - !Sub "${DynamoDBTable.Arn}"
+        - !Sub "${DynamoDBTable.Arn}/index/*"
     - Effect: Allow
       Action:
         - sqs:SendMessage
       Resource:
-        - !GetAtt "SQSWebhookQueue.Arn"
+        - !Sub "${SQSWebhookQueue.Arn}"
   logRetentionInDays: 90
 
 functions:
@@ -99,30 +99,34 @@ functions:
 
 resources:
   Resources:
-    # This table is used to have a reference to all connected clients and their assigned socket ID's
-    DynamoDBConnectionsTable:
+    DynamoDBTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: serverless-websockets-connections-${self:provider.stage}
+        TableName: serverless-websockets-${self:provider.stage}
         BillingMode: 'PAY_PER_REQUEST'
         AttributeDefinitions:
-          - AttributeName: connection-id
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+          - AttributeName: GSI1PK
+            AttributeType: S
+          - AttributeName: GSI1SK
             AttributeType: S
         KeySchema:
-          - AttributeName: connection-id
+          - AttributeName: PK
             KeyType: HASH
-    # This table is used to have a reference to all occupied channels and their connected clients and optional user info
-    DynamoDBChannelsTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: serverless-websockets-channels-${self:provider.stage}
-        BillingMode: 'PAY_PER_REQUEST'
-        AttributeDefinitions:
-          - AttributeName: channel-id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: channel-id
-            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: GSI1
+            Projection:
+              ProjectionType: ALL
+            KeySchema:
+              - AttributeName: GSI1PK
+                KeyType: HASH
+              - AttributeName: GSI1SK
+                KeyType: RANGE
     # This queue is used to asynchronously handle sending webhooks
     SQSWebhookQueue:
       Type: AWS::SQS::Queue

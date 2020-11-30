@@ -53,7 +53,7 @@ class PusherClientMessageHandler implements MessageHandler
             return;
         }
 
-        $channel = $this->channelManager->findOrNewChannel($this->payload['channel']);
+        $channel = $this->channelManager->channel($this->payload['channel']);
 
         if (!in_array($this->event->getConnectionId(), $channel->connectionIds())) {
             $this->respondToEvent(
@@ -75,7 +75,7 @@ class PusherClientMessageHandler implements MessageHandler
                 'channel'   => $this->payload['channel'],
                 'event'     => $this->payload['event'],
                 'data'      => $this->payload['data'] ?? null,
-                'socket_id' => $this->channelManager->findSocketIdForConnectionId($this->event->getConnectionId()),
+                'socket_id' => $this->channelManager->findConnection($this->event->getConnectionId())->getSocketId(),
                 'user_id'   => $channel instanceof PresenceChannel ? $channel->findUserIdForConnectionId($this->event->getConnectionId()) : null,
             ]);
         }

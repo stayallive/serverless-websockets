@@ -10,7 +10,7 @@ class FetchChannelUsers extends Controller
 {
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, string $channelName): ResponseInterface
     {
-        $channel = $this->connections->findOrNewChannel($channelName);
+        $channel = $this->connections->channel($channelName);
 
         if (!$channel instanceof PresenceChannel) {
             return $this->responseFactory->createResponse(400, 'User can only be retrieved for presence channels.');

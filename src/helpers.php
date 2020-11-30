@@ -51,6 +51,11 @@ function app_sqs_url(): string
     return get_required_env_var('APP_SQS_URL');
 }
 
+function app_db_table(): string
+{
+    return get_required_env_var('APP_DB_TABLE');
+}
+
 function app_ws_api_id(): string
 {
     return get_required_env_var('APP_WS_API_ID');
@@ -59,16 +64,6 @@ function app_ws_api_id(): string
 function app_ws_api_endpoint(): string
 {
     return sprintf('%s.execute-api.%s.amazonaws.com', app_ws_api_id(), app_region());
-}
-
-function app_db_channels_table(): string
-{
-    return get_required_env_var('APP_DB_CHANNELS_TABLE');
-}
-
-function app_db_connections_table(): string
-{
-    return get_required_env_var('APP_DB_CONNECTIONS_TABLE');
 }
 
 

@@ -4,6 +4,7 @@ namespace Stayallive\ServerlessWebSockets\Connections;
 
 use Illuminate\Support\Str;
 use Bref\Event\ApiGateway\WebsocketEvent;
+use Stayallive\ServerlessWebSockets\Entities\Connection;
 use Stayallive\ServerlessWebSockets\Connections\Channels\AbstractChannel;
 
 abstract class ConnectionManager
@@ -18,16 +19,14 @@ abstract class ConnectionManager
     abstract public function disconnectConnectionId(string $connectionId): void;
 
 
+    abstract public function findConnection(string $connectionId): ?Connection;
+
     abstract public function findStaleConnectionIds(int $timeout = 86400): array;
 
-    abstract public function findSocketIdForConnectionId(string $connectionId): ?string;
 
+    abstract public function channel(string $channelName): AbstractChannel;
 
     abstract public function channels(): array;
-
-    abstract public function findChannel(string $channelName): ?AbstractChannel;
-
-    abstract public function findOrNewChannel(string $channelName): AbstractChannel;
 
 
     public function isAuthenticatedChannel(string $channelName): bool

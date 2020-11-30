@@ -58,10 +58,19 @@ class PusherProtocolMessageHandler implements MessageHandler
      */
     protected function subscribe(): void
     {
-        $socketId = $this->channelManager->findSocketIdForConnectionId($this->event->getConnectionId());
+        $connection = $this->channelManager->findConnection($this->event->getConnectionId());
 
-        $this->channelManager->findOrNewChannel($this->payload['data']['channel'])
-                             ->subscribe($this->event->getConnectionId(), $socketId, $this->payload['data'] ?? []);
+        if ($connection === null) {
+            $this->respondToEvent(
+                $this->event,
+                $this->buildPusherErrorMessage('Socket not registered.', 4200)
+            );
+
+            return;
+        }
+
+        $this->channelManager->channel($this->payload['data']['channel'])
+                             ->subscribe($connection, $this->payload['data'] ?? []);
     }
 
     /**
@@ -69,7 +78,7 @@ class PusherProtocolMessageHandler implements MessageHandler
      */
     protected function unsubscribe(): void
     {
-        $this->channelManager->findOrNewChannel($this->payload['data']['channel'])
+        $this->channelManager->channel($this->payload['data']['channel'])
                              ->unsubscribe($this->event->getConnectionId());
     }
 }
