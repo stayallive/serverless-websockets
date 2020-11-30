@@ -37,6 +37,9 @@ aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/web
 # Add the events you want to receive: channel_occupied,channel_vacated,member_added,member_removed,client_event
 aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/webhook-events" --type String --value ''
 
+# Set to true if you want to see how many clients are connected and how long they are connected on average
+aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/write-cloudwatch-metrics" --type String --value 'false'
+
 # Set to true if you want to allow clients to send event in authenticated channels
 aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/client-events-enabled" --type String --value 'false'
 
