@@ -46,6 +46,33 @@ aws ssm put-parameter --region $REGION --name "/serverless-websockets/$STAGE/wav
 
 Do not forget to re-deploy after updating the parameters.
 
+## CLI
+
+There is a Lambda function called CLI created for each deployment, this Lambda serves a few purposes.
+
+You can call any CLI action by executing:
+
+```bash
+# Don't forget to include --stage=<stage> if you want to execute it on a specific stage
+serverless invoke -f cli -d '{"action": "<ACTION NAME>"}'
+```
+
+### One-off commands
+
+#### disconnect-all-connections
+
+Executing this action will disconnect all currently connected clients. It will not prevent them from immediately reconnecting.
+
+### Scheduled commands
+
+#### write-cloudwatch-metrics
+
+This action is scheduled to run every minute and is disabled by default. It writes the current amount of connectiond and the average time the currently connected clients are connected.
+
+#### cleanup-stale-connections
+
+This action is scheduled to run every 4 hours and is enabled by default. It finds and disconnects client who are connected for over 24 hours.
+
 ## Limitations
 
 This project uses the AWS API Gateway to provide it's WebSocket connection. The limitation with using the API Gateway is that you cannot specify a WebSocket endpoint yourself, it's defined by AWS and defaults to `wss://<gateway-endpoint>/<stage-name>`. This has 2 drawbacks:

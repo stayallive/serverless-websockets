@@ -23,6 +23,8 @@ abstract class ConnectionManager
 
     abstract public function findStaleConnectionIds(int $timeout = 86400): array;
 
+    abstract public function retrieveConnectionStatistics(): array;
+
 
     abstract public function channel(string $channelName): AbstractChannel;
 

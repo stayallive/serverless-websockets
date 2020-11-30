@@ -83,9 +83,11 @@ class ConnectionManager extends BaseConnectionManager
         $request = $this->db->query(new QueryInput([
             'TableName'                 => app_db_table(),
             'FilterExpression'          => '#time <= :timeout',
+            'ProjectionExpression'      => '#connection',
             'KeyConditionExpression'    => 'PK = :pk',
             'ExpressionAttributeNames'  => [
-                '#time' => 'connect-time',
+                '#time'       => 'connect-time',
+                '#connection' => 'connection-id',
             ],
             'ExpressionAttributeValues' => [
                 ':pk'      => new AttributeValue(['S' => 'CONNECTIONS']),
@@ -96,6 +98,33 @@ class ConnectionManager extends BaseConnectionManager
         return array_map(static function (array $item): string {
             return $item['connection-id']->getS();
         }, iterator_to_array($request->getItems()));
+    }
+
+    public function retrieveConnectionStatistics(): array
+    {
+        $time = time();
+
+        $request = $this->db->query(new QueryInput([
+            'TableName'                 => app_db_table(),
+            'ProjectionExpression'      => '#time',
+            'KeyConditionExpression'    => 'PK = :pk',
+            'ExpressionAttributeNames'  => [
+                '#time' => 'connect-time',
+            ],
+            'ExpressionAttributeValues' => [
+                ':pk' => new AttributeValue(['S' => 'CONNECTIONS']),
+            ],
+        ]));
+
+        $connectionTimes = collect(iterator_to_array($request->getItems()))
+            ->map(static function (array $item) use ($time): string {
+                return $time - $item['connect-time']->getN();
+            });
+
+        return [
+            $connectionTimes->count(),
+            $connectionTimes->average(),
+        ];
     }
 
 

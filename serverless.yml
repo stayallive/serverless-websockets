@@ -52,6 +52,14 @@ provider:
         - sqs:SendMessage
       Resource:
         - !Sub "${SQSWebhookQueue.Arn}"
+    - Effect: Allow
+      Action:
+        - cloudwatch:PutMetricData
+      Resource: '*'
+      Condition:
+        StringEquals:
+          cloudwatch:namespace: ServerlessWebSockets
+
   logRetentionInDays: 90
 
 functions:
@@ -63,6 +71,24 @@ functions:
     events:
       - httpApi: '*'
     description: 'Serverless Websockets API'
+  cli:
+    handler: handlers/cli.php
+    layers:
+      - ${bref:layer.php-74}
+    description: 'Serverless Websockets CLI'
+    events:
+      - schedule:
+          rate: rate(1 minute)
+          input:
+            action: 'write-cloudwatch-metrics'
+          enabled: ${strToBool(${ssm:/serverless-websockets/${self:provider.stage}/write-cloudwatch-metrics, 'false'})}
+          description: 'Serverless Websockets Write CloudWatch metrics'
+      - schedule:
+          rate: rate(4 hours)
+          input:
+            action: 'cleanup-stale-connections'
+          enabled: ${strToBool(${ssm:/serverless-websockets/${self:provider.stage}/cleanup-stale-connections, 'true'})}
+          description: 'Serverless Websockets Cleanup stale connections'
   websocket:
     handler: handlers/websocket.php
     layers:
@@ -84,18 +110,6 @@ functions:
           enabled: ${strToBool(${ssm:/serverless-websockets/${self:provider.stage}/webhook-enabled, 'false'})}
           batchSize: 1
     description: 'Serverless Websockets Webhook'
-  disconnect-all-clients:
-    handler: handlers/disconnect-all-clients.php
-    layers:
-      - ${bref:layer.php-74}
-    description: 'Serverless Websockets Disconnect all clients'
-  cleanup-stale-connections:
-    handler: handlers/cleanup-stale-connections.php
-    layers:
-      - ${bref:layer.php-74}
-    events:
-      - schedule: rate(4 hours)
-    description: 'Serverless Websockets Cleanup stale connections'
 
 resources:
   Resources:
