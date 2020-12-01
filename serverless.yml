@@ -59,8 +59,7 @@ provider:
       Condition:
         StringEquals:
           cloudwatch:namespace: ServerlessWebSockets
-
-  logRetentionInDays: 90
+  logRetentionInDays: 30
 
 functions:
   api:
