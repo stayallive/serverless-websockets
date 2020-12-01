@@ -89,7 +89,7 @@ class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
     {
         $userId = $this->findUserIdForConnectionId($connectionId);
 
-        if ($userId !== null && !$this->userHasOpenConnections($userId)) {
+        if ($userId !== null && !$this->userHasOpenConnections($userId, $connectionId)) {
             $this->db->deleteItem(new DeleteItemInput([
                 'TableName' => app_db_table(),
                 'Key'       => [
