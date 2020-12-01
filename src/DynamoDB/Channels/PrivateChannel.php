@@ -13,6 +13,8 @@ class PrivateChannel extends AbstractChannel implements PrivateChannelInterface
             $connection->sendMessage(
                 $this->buildPusherErrorMessage('Invalid Signature', 4009)
             );
+
+            return;
         }
 
         parent::subscribe($connection, $payload);
