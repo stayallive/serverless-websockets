@@ -8,10 +8,8 @@ use Stayallive\ServerlessWebSockets\Connections\ConnectionManager;
 
 class MessageHandlerFactory
 {
-    public static function fromSocketEvent(WebsocketEvent $event, ConnectionManager $channelManager): MessageHandler
+    public static function fromSocketEvent(WebsocketEvent $event, array $payload, ConnectionManager $channelManager): MessageHandler
     {
-        $payload = json_decode($event->getBody(), true);
-
         if (Str::startsWith($payload['event'], 'internal:')) {
             return new InternalProtocolMessageHandler($payload, $event, $channelManager);
         }

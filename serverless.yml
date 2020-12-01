@@ -15,6 +15,7 @@ provider:
     APP_SQS_URL: !Ref "SQSWebhookQueue"
     APP_DB_TABLE: !Ref "DynamoDBTable"
     APP_WS_API_ID: !Ref "WebsocketsApi"
+    APP_LOG_LEVEL: ${ssm:/serverless-websockets/${self:provider.stage}/log-level, 'info'}
 
     # Configure the Pusher protocol app ID, key and secret
     APP_ID: ${ssm:/serverless-websockets/${self:provider.stage}/app-id}

@@ -1,5 +1,6 @@
 <?php
 
+use Psr\Log\LoggerInterface;
 use Psr\Container\ContainerInterface;
 use Slim\Routing\RouteCollectorProxy;
 use Slim\Exception\HttpNotFoundException;
