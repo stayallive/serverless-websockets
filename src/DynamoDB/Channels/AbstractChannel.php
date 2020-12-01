@@ -9,7 +9,7 @@ use AsyncAws\DynamoDb\ValueObject\AttributeValue;
 use Stayallive\ServerlessWebSockets\Entities\Connection;
 use Stayallive\ServerlessWebSockets\Messages\PusherMessage;
 use Stayallive\ServerlessWebSockets\Messages\SendsPusherMessages;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Stayallive\ServerlessWebSockets\Exceptions\CouldNotSendSocketMessage;
 use Stayallive\ServerlessWebSockets\DynamoDB\Entities\Connection as DynamoDBConnection;
 use Stayallive\ServerlessWebSockets\Connections\Channels\AbstractChannel as BaseChannel;
 
@@ -98,9 +98,8 @@ abstract class AbstractChannel extends BaseChannel
 
             try {
                 $this->sendMessageToConnection($connectionId, $message);
-            } catch (ClientExceptionInterface $e) {
-                // Handle disconnected clients that were not cleaned up correctly
-                if ($e->getResponse()->getStatusCode() === 410) {
+            } catch (CouldNotSendSocketMessage $e) {
+                if ($e->getReason() === CouldNotSendSocketMessage::REASON_DISCONNECTED) {
                     echo "Found a stale connection in channel:{$this->name} connection:{$connectionId}, unsubscribing." . PHP_EOL;
 
                     $this->unsubscribe($connectionId);
@@ -167,8 +166,12 @@ abstract class AbstractChannel extends BaseChannel
 
     protected function respondWithSubscriptionSucceeded(Connection $connection): void
     {
-        $connection->sendMessage(
-            $this->buildPusherChannelMessage($this->name, 'pusher_internal:subscription_succeeded')
-        );
+        try {
+            $connection->sendMessage(
+                $this->buildPusherChannelMessage($this->name, 'pusher_internal:subscription_succeeded')
+            );
+        } catch (CouldNotSendSocketMessage $e) {
+            $this->unsubscribe($connection->getConnectionId());
+        }
     }
 }

@@ -7,6 +7,7 @@ use AsyncAws\DynamoDb\Input\DeleteItemInput;
 use AsyncAws\DynamoDb\ValueObject\AttributeValue;
 use Stayallive\ServerlessWebSockets\Entities\User;
 use Stayallive\ServerlessWebSockets\Entities\Connection;
+use Stayallive\ServerlessWebSockets\Exceptions\CouldNotSendSocketMessage;
 use Stayallive\ServerlessWebSockets\DynamoDB\Entities\User as DynamoDBUser;
 use Stayallive\ServerlessWebSockets\Connections\Channels\PresenceChannel as PresenceChannelInterface;
 
@@ -114,13 +115,17 @@ class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
 
     protected function respondWithSubscriptionSucceeded(Connection $connection): void
     {
-        $connection->sendMessage(
-            $this->buildPusherChannelMessage(
-                $this->name,
-                'pusher_internal:subscription_succeeded',
-                $this->getChannelData()
-            )
-        );
+        try {
+            $connection->sendMessage(
+                $this->buildPusherChannelMessage(
+                    $this->name,
+                    'pusher_internal:subscription_succeeded',
+                    $this->getChannelData()
+                )
+            );
+        } catch (CouldNotSendSocketMessage $e) {
+            $this->unsubscribe($connection->getConnectionId());
+        }
     }
 
 

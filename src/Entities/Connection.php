@@ -3,9 +3,12 @@
 namespace Stayallive\ServerlessWebSockets\Entities;
 
 use Stayallive\ServerlessWebSockets\Messages\Message;
+use Stayallive\ServerlessWebSockets\Messages\SendsMessages;
 
 class Connection extends Entity
 {
+    use SendsMessages;
+
     protected string  $connectionId;
     protected string  $socketId;
     protected int     $connectTime;
@@ -46,7 +49,7 @@ class Connection extends Entity
 
     public function sendMessage(Message $message): void
     {
-        socket_client()->message($this->getConnectionId(), $message->toMessageBody());
+        $this->sendMessageToConnection($this->getConnectionId(), $message);
     }
 
     public static function createForConnection(string $connectionId, string $userId = null): Connection
