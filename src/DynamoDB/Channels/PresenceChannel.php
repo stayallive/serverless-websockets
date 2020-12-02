@@ -90,14 +90,18 @@ class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
     {
         $userId = $this->findUserIdForConnectionId($connectionId);
 
-        if ($userId !== null && !$this->userHasOpenConnections($userId, $connectionId)) {
+        $wasLastConnectionForUser = $userId !== null && !$this->userHasOpenConnections($userId, $connectionId);
+
+        parent::removeConnectionForConnectionId($connectionId);
+
+        if ($wasLastConnectionForUser) {
             $this->db->deleteItem(new DeleteItemInput([
                 'TableName' => app_db_table(),
                 'Key'       => [
                     'PK' => new AttributeValue(['S' => "CHANNEL#{$this->name}"]),
                     'SK' => new AttributeValue(['S' => "USER#{$userId}"]),
                 ],
-            ]));
+            ]))->resolve(0);
 
             unset($this->users[$userId]);
 
@@ -109,8 +113,6 @@ class PresenceChannel extends PrivateChannel implements PresenceChannelInterface
 
             queue_webhook('member_removed', ['channel' => $this->name, 'user_id' => $userId]);
         }
-
-        parent::removeConnectionForConnectionId($connectionId);
     }
 
     protected function respondWithSubscriptionSucceeded(Connection $connection): void
