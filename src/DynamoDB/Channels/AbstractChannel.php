@@ -155,7 +155,7 @@ abstract class AbstractChannel extends BaseChannel
                 'PK' => new AttributeValue(['S' => "CHANNEL#{$this->name}"]),
                 'SK' => new AttributeValue(['S' => "CONNECTION#{$connectionId}"]),
             ],
-        ]));
+        ]))->resolve(0);
 
         unset($this->connections[$connectionId]);
 
