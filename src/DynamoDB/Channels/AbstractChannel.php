@@ -9,6 +9,7 @@ use AsyncAws\DynamoDb\ValueObject\AttributeValue;
 use Stayallive\ServerlessWebSockets\Entities\Connection;
 use Stayallive\ServerlessWebSockets\Messages\PusherMessage;
 use Stayallive\ServerlessWebSockets\Messages\SendsPusherMessages;
+use Stayallive\ServerlessWebSockets\Connections\ConnectionManager;
 use Stayallive\ServerlessWebSockets\Exceptions\CouldNotSendSocketMessage;
 use Stayallive\ServerlessWebSockets\DynamoDB\Entities\Connection as DynamoDBConnection;
 use Stayallive\ServerlessWebSockets\Connections\Channels\AbstractChannel as BaseChannel;
@@ -19,14 +20,17 @@ abstract class AbstractChannel extends BaseChannel
 
     protected DynamoDbClient $db;
 
+    protected ConnectionManager $connectionManager;
+
     /** @var array<string, \Stayallive\ServerlessWebSockets\Entities\Connection> */
     protected array $connections;
 
-    public function __construct(string $name, DynamoDbClient $db, array $data = [])
+    public function __construct(string $name, ConnectionManager $connectionManager, DynamoDbClient $db, array $data = [])
     {
         parent::__construct($name);
 
-        $this->db = $db;
+        $this->db                = $db;
+        $this->connectionManager = $connectionManager;
 
         $this->hydrateFromDynamoDBRecords($data);
     }
@@ -91,6 +95,8 @@ abstract class AbstractChannel extends BaseChannel
             $message->withData($data);
         }
 
+        $disconnectedConnectionIds = [];
+
         foreach ($this->connectionIds() as $connectionId) {
             if ($exceptConnectionId !== null && $exceptConnectionId === $connectionId) {
                 continue;
@@ -100,13 +106,17 @@ abstract class AbstractChannel extends BaseChannel
                 $this->sendMessageToConnection($connectionId, $message);
             } catch (CouldNotSendSocketMessage $e) {
                 if ($e->getReason() === CouldNotSendSocketMessage::REASON_DISCONNECTED) {
-                    echo "Found a stale connection in channel:{$this->name} connection:{$connectionId}, unsubscribing." . PHP_EOL;
-
-                    $this->unsubscribe($connectionId);
+                    $disconnectedConnectionIds[] = $connectionId;
 
                     continue;
                 }
             }
+        }
+
+        foreach ($disconnectedConnectionIds as $disconnectedConnectionId) {
+            echo "Found a stale connection in channel:{$this->name} connection:{$disconnectedConnectionId}, disconnecting." . PHP_EOL;
+
+            $this->connectionManager->disconnectConnectionId($disconnectedConnectionId);
         }
     }
 
