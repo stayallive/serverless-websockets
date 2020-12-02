@@ -16,7 +16,7 @@ class Connection extends ConnectionEntity
         return new self(
             $record['connection-id']->getS(),
             $record['socket-id']->getS(),
-            (int)$record['connect-time']->getS(),
+            (int)$record['connect-time']->getN(),
             isset($record['user-id']) ? $record['user-id']->getS() : null
         );
     }

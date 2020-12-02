@@ -54,12 +54,7 @@ class Connection extends Entity
 
     public static function createForConnection(string $connectionId, string $userId = null): Connection
     {
-        return new self(
-            $connectionId,
-            self::generateSocketId(),
-            time(),
-            $userId
-        );
+        return new self($connectionId, self::generateSocketId(), time(), $userId);
     }
 
     protected static function generateSocketId(): string
