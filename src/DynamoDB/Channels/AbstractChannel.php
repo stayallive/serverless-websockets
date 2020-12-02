@@ -114,7 +114,7 @@ abstract class AbstractChannel extends BaseChannel
         }
 
         foreach ($disconnectedConnectionIds as $disconnectedConnectionId) {
-            echo "Found a stale connection in channel:{$this->name} connection:{$disconnectedConnectionId}, disconnecting." . PHP_EOL;
+            echo "Found a stale connection in channel:{$this->name} connection:{$disconnectedConnectionId}, disconnecting..." . PHP_EOL;
 
             $this->connectionManager->disconnectConnectionId($disconnectedConnectionId);
         }
