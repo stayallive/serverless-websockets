@@ -23,6 +23,9 @@ class ConnectionManager extends BaseConnectionManager
 {
     private DynamoDbClient $db;
 
+    /** @var array<string, \Stayallive\ServerlessWebSockets\Connections\Channels\Channel> */
+    private array $channels = [];
+
     public function __construct(DynamoDbClient $db)
     {
         $this->db = $db;
@@ -130,17 +133,21 @@ class ConnectionManager extends BaseConnectionManager
 
     public function channel(string $channelName): AbstractChannel
     {
-        $request = $this->db->query(new QueryInput([
-            'TableName'                 => app_db_table(),
-            'KeyConditionExpression'    => 'PK = :pk',
-            'ExpressionAttributeValues' => [
-                ':pk' => new AttributeValue(['S' => "CHANNEL#{$channelName}"]),
-            ],
-        ]));
+        if (!isset($this->channels[$channelName])) {
+            $request = $this->db->query(new QueryInput([
+                'TableName'                 => app_db_table(),
+                'KeyConditionExpression'    => 'PK = :pk',
+                'ExpressionAttributeValues' => [
+                    ':pk' => new AttributeValue(['S' => "CHANNEL#{$channelName}"]),
+                ],
+            ]));
 
-        $channelClass = $this->determineChannelClass($channelName);
+            $channelClass = $this->determineChannelClass($channelName);
 
-        return new $channelClass($channelName, $this->db, iterator_to_array($request->getItems()));
+            $this->channels[$channelName] = new $channelClass($channelName, $this, $this->db, iterator_to_array($request->getItems()));
+        }
+
+        return $this->channels[$channelName];
     }
 
     public function channels(): array
