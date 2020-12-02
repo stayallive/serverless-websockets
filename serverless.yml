@@ -92,7 +92,7 @@ functions:
           description: 'Serverless Websockets Cleanup stale connections'
   websocket:
     handler: handlers/websocket.php
-    timeout: 10
+    timeout: 60
     layers:
       - ${bref:layer.php-74}
     events:
