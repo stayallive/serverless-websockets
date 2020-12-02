@@ -73,6 +73,7 @@ functions:
     description: 'Serverless Websockets API'
   cli:
     handler: handlers/cli.php
+    timeout: 300
     layers:
       - ${bref:layer.php-74}
     description: 'Serverless Websockets CLI'
@@ -91,6 +92,7 @@ functions:
           description: 'Serverless Websockets Cleanup stale connections'
   websocket:
     handler: handlers/websocket.php
+    timeout: 10
     layers:
       - ${bref:layer.php-74}
     events:
