@@ -36,7 +36,7 @@ abstract class Controller
     {
         $response = $this->responseFactory->createResponse($status);
 
-        // Make sure empty response contain an emoty JSON hash
+        // Make sure empty response contain an empty JSON hash
         if (empty($data)) {
             $data = new stdClass;
         }
