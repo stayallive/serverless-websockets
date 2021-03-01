@@ -47,10 +47,10 @@ class WebhookHandler extends SqsHandler
                 ],
             ]);
 
-            echo "Webhook delivered for event: {$event}" . PHP_EOL;
+            log_message("Webhook delivered for event: {$event}");
         } catch (TransportExceptionInterface $e) {
             // We ignore failures, we simply log them but pretend like everything went OK to prevent lambda retries
-            echo "Webhook delivery failure: {$e->getMessage()} (event: {$event})" . PHP_EOL;
+            log_message("Webhook delivery failure: {$e->getMessage()} (event: {$event})");
         }
     }
 }

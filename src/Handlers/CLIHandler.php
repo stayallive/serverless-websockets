@@ -31,7 +31,7 @@ class CLIHandler
                 $this->executeDisconnectAllConnections();
                 break;
             default:
-                echo "CLI action {$action} not found, make sure you supply the correct action!";
+                log_message("CLI action {$action} not found, make sure you supply the correct action!");
                 break;
         }
     }
@@ -88,7 +88,7 @@ class CLIHandler
 
         $staleConnectionIds = $connectionManager->findStaleConnectionIds();
 
-        echo 'Found ' . count($staleConnectionIds) . ' stale connections to force disconnect.' . PHP_EOL;
+        log_message('Found ' . count($staleConnectionIds) . ' stale connections to force disconnect.');
 
         foreach ($staleConnectionIds as $connectionId) {
             $connectionManager->disconnectConnectionId($connectionId);
@@ -107,7 +107,7 @@ class CLIHandler
 
         $connectionIds = $connectionManager->findStaleConnectionIds(0);
 
-        echo 'Found ' . count($connectionIds) . ' connections to force disconnect.' . PHP_EOL;
+        log_message('Found ' . count($connectionIds) . ' connections to force disconnect.');
 
         foreach ($connectionIds as $connectionId) {
             $connectionManager->disconnectConnectionId($connectionId);

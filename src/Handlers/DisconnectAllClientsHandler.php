@@ -18,7 +18,7 @@ class DisconnectAllClientsHandler
     {
         $staleConnectionIds = $this->connectionManager->findStaleConnectionIds(0);
 
-        echo 'Found ' . count($staleConnectionIds) . ' connections to force disconnect.' . PHP_EOL;
+        log_message('Found ' . count($staleConnectionIds) . ' connections to force disconnect.');
 
         foreach ($staleConnectionIds as $connectionId) {
             $this->connectionManager->disconnectConnectionId($connectionId);

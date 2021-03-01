@@ -9,6 +9,18 @@ use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 
+function log_message(string $message): void
+{
+    if (!defined('STDERR')) {
+        echo trim($message);
+
+        return;
+    }
+
+    fwrite(STDERR, trim($message) . PHP_EOL);
+}
+
+
 function get_required_env_var(string $name)
 {
     $value = getenv($name);
