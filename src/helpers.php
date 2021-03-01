@@ -11,13 +11,13 @@ use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 
 function log_message(string $message): void
 {
-    if (!defined('STDERR')) {
-        echo trim($message);
+    $message = trim($message) . PHP_EOL;
 
-        return;
+    if (!defined('STDERR')) {
+        define('STDERR', fopen('php://stderr', 'w'));
     }
 
-    fwrite(STDERR, trim($message) . PHP_EOL);
+    fwrite(STDERR, $message);
 }
 
 
