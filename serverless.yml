@@ -66,6 +66,7 @@ functions:
   api:
     handler: handlers/api.php
     timeout: 28
+    memorySize: 512
     layers:
       - ${bref:layer.php-74-fpm}
     events:
@@ -74,6 +75,7 @@ functions:
   cli:
     handler: handlers/cli.php
     timeout: 300
+    memorySize: 256
     layers:
       - ${bref:layer.php-74}
     description: 'Serverless Websockets CLI'
@@ -93,6 +95,7 @@ functions:
   websocket:
     handler: handlers/websocket.php
     timeout: 60
+    memorySize: 1024 # This is way too much for what it does but this ensures that it has enough CPU power to execute quickly
     layers:
       - ${bref:layer.php-74}
     events:
@@ -105,6 +108,7 @@ functions:
     layers:
       - ${bref:layer.php-74}
     timeout: 300
+    memorySize: 256
     reservedConcurrency: 10
     events:
       - sqs:
